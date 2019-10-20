@@ -1,0 +1,3 @@
+CREATE USER "cuppa-authentication" NOSUPERUSER;
+ALTER USER "cuppa-authentication" WITH PASSWORD 'toor-authentication-cuppa';
+CREATE DATABASE "cuppa-authentication" WITH OWNER 'cuppa-authentication';

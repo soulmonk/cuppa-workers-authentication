@@ -1,0 +1,14 @@
+{
+  "Port": "3000",
+  "Mongo": {
+    "Server": "localhost",
+    "Database": "cuppa-authentication"
+  },
+  "Pg": {
+    "Host": "127.0.0.1",
+    "Port": "5432",
+    "User": "cuppa-authentication",
+    "Password": "toor-authentication-cuppa",
+    "Dbname": "cuppa-authentication"
+  }
+}
