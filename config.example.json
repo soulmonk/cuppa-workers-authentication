@@ -1,5 +1,5 @@
 {
-  "Port": "3000",
+  "Port": "51101",
   "Mongo": {
     "Server": "localhost",
     "Database": "cuppa-authentication"

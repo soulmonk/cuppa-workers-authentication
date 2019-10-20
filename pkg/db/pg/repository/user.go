@@ -23,10 +23,12 @@ func (dao *UserDao) Update(model *domain.User) error {
 }
 
 func (dao *UserDao) Create(model *domain.User) error {
-	query := `INSERT INTO "` + dao.tableName + `" (name, email, password, salt, enabled, created_at, updated_at) VALUES ($1, $2, $3, false, now(), now()) RETURNING id, created_at, updated_at`
+	query := `INSERT INTO "` + dao.tableName + `" (name, email, password, salt, enabled, created_at, updated_at)) 
+VALUES ($1, $2, $3, $4, false, now(), now()) RETURNING id, created_at, updated_at
+RETURNING id, enabled, created_at, updated_at`
 	err := dao.db.
 		QueryRow(query, model.Name, model.Email, model.Password, model.Salt).
-		Scan(&model.ID, &model.CreatedAt, &model.UpdatedAt)
+		Scan(&model.ID, &model.Enabled, &model.CreatedAt, &model.UpdatedAt)
 
 	if err != nil {
 		log.Println("Error on create model")
@@ -36,15 +38,20 @@ func (dao *UserDao) Create(model *domain.User) error {
 	return nil
 }
 
-func (dao *UserDao) List() (domain.Users, error) {
-	res := domain.Users{}
+func (dao *UserDao) List() (*domain.Users, error) {
+	var res = domain.Users{}
 	var err error
 
-	rows, err := dao.db.Queryx(`SELECT * FROM "` + dao.tableName + `" ORDER BY updated_at DESC`)
+	// todo wtf
+	var resp = func(err error) (*domain.Users, error) {
+		return &res, err
+	}
+
+	rows, err := dao.db.Queryx(`SELECT id, name, email, enabled, created_at, updated_at FROM "` + dao.tableName + `" ORDER BY updated_at DESC`)
 
 	if err != nil {
 		log.Println("Error on executing query")
-		return res, err
+		return resp(err)
 	}
 
 	defer func() {
@@ -57,27 +64,27 @@ func (dao *UserDao) List() (domain.Users, error) {
 		model := domain.User{}
 		if err := rows.StructScan(&model); err != nil {
 			log.Println("Error corrupted while scanning user:", err.Error())
-			return res, err
+			return &res, err
 		}
 
 		res.List = append(res.List, model)
 	}
 	if err := rows.Err(); err != nil {
 		log.Println("Error on fetching rows:", err.Error())
-		return res, err
+		return &res, err
 	}
-	return res, err
+	return &res, err
 }
 
-func (dao *UserDao) FindById(id string) (domain.User, error) {
+func (dao *UserDao) FindById(id string) (*domain.User, error) {
 	query := `SELECT * FROM "` + dao.tableName + `" where id = $1`
-	var note = domain.User{}
+	var model = domain.User{}
 
-	if err := dao.db.Get(&note, query, id); err != nil {
+	if err := dao.db.Get(&model, query, id); err != nil {
 		log.Println("Error on fetching note", err.Error())
-		return note, err
+		return &model, err
 	}
-	return note, nil
+	return &model, nil
 }
 
 func (dao *UserDao) Delete(id string) error {

@@ -1,31 +1,29 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
+	"../config"
+	"../pkg"
+	"../pkg/db/pg"
+	"../pkg/services"
+	"../pkg/web/rest"
 	"log"
-	"net/http"
 )
-
-var app = pkg.Application{}
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	app.Config = config.Load()
-	app.PgDao = pg.GetDao(&app.Config.Pg)
+
+	app := pkg.Application{}
+	conf := config.Load()
+	pgDao := pg.GetDao(&conf.Pg)
+
+	app.Services = services.Init(pgDao)
+	app.Config = conf
 
 	defer func() {
-		if err := app.PgDao.Close(); err != nil {
+		if err := pgDao.Close(); err != nil {
 			log.Fatal(err)
 		}
 	}()
 
-	r := mux.NewRouter()
-
-	controllers.Init(&app, r)
-
-	addr := ":3000"
-	log.Println("listen on", addr)
-	if err := http.ListenAndServe(addr, r); err != nil {
-		log.Fatal(err)
-	}
+	rest.Init(&app)
 }

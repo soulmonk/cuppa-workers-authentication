@@ -22,6 +22,9 @@ type Config struct {
 	Pg   PG
 }
 
+// TODO application.Config vs config.Get()
+var config Config
+
 // read and parse the configuration file
 func (c *Config) read() {
 	// TODO relevant path to the runner (app)
@@ -38,8 +41,12 @@ func (c *Config) read() {
 }
 
 func Load() *Config {
-	config := Config{}
+	config = Config{}
 	config.read()
 
+	return Get()
+}
+
+func Get() *Config {
 	return &config
 }
