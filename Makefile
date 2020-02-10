@@ -79,25 +79,26 @@ go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
 	@go get $(get)
 
-## install swagger-docker
+## install-swagger-docker: install swagger-docker
 install-swagger-docker:
 	@echo "  > Installing swagger docker"
 	@docker pull swaggerapi/swagger-ui
 
+## create-swagger-docker: create docker container "authentication-swagger-ui"
 create-swagger-docker:
 	@docker create --name authentication-swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
 
-## running swagger docker
+## run-swagger-docker: running swagger docker
 run-swagger-docker:
 	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
 	@docker run -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
 
-## starting swagger docker
+## start-swagger-docker: starting swagger docker
 start-swagger-docker:
 	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
 	@docker start authentication-swagger-ui
 
-## stopping swagger docker
+## stop-swagger-docker: stopping swagger docker
 stop-swagger-docker:
 	@echo "  >  Stopping swagger docker"
 	@docker stop authentication-swagger-ui
