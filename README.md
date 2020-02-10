@@ -4,3 +4,7 @@ Install packages
 
 Build application
 `go build -o build/app cmd/app.go`
+
+## TODO
+- use go mod
+- ??? user id in login response

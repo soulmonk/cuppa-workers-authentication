@@ -4,9 +4,9 @@ create table "user"
         constraint user_pk
             primary key,
     name       varchar(64),
-    email      varchar(255),
-    password   varchar(255),
-    salt       varchar(255),
+    email      varchar(256),
+    password   varchar(256),
+    salt       varchar(256),
     enabled    boolean   default false,
     created_at timestamp default now(),
     updated_at timestamp default now()

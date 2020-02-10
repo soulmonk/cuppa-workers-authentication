@@ -11,8 +11,8 @@ type User struct {
 	Password  string    `bson:"password,skip" json:"password,skip"`
 	Salt      string    `bson:"salt,delete" json:"salt,delete"` // todo remove field
 	Enabled   bool      `bson:"enable" json:"enable"`
-	CreatedAt time.Time `bson:"created_at,omitempty" json:"created_at,omitempty" db:"created_at"`
-	UpdatedAt time.Time `bson:"updated_at,omitempty" json:"updated_at,omitempty" db:"updated_at"`
+	CreatedAt time.Time `bson:"createdAt,omitempty" json:"createdAt,omitempty" db:"created_at"`
+	UpdatedAt time.Time `bson:"updatedAt,omitempty" json:"updatedAt,omitempty" db:"updated_at"`
 }
 
 type Users struct {
