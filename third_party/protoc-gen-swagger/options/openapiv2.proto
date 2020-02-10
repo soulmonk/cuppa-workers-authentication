@@ -42,8 +42,8 @@ message Swagger {
   SecurityDefinitions security_definitions = 11;
   repeated SecurityRequirement security = 12;
   // field 13 is reserved for 'tags', which are supposed to be exposed as and
-  // customizable as proto services. TODO(ivucica): add processing of proto
-  // service objects into OpenAPI v2 Tag objects.
+  // customizable as proto service. TODO(ivucica): add processing of proto
+  // protocol objects into OpenAPI v2 Tag objects.
   reserved 13;
   ExternalDocumentation external_docs = 14;
   map<string, google.protobuf.Value> extensions = 15;
@@ -244,7 +244,7 @@ message JSONSchema {
 // TODO(ivucica): document fields
 message Tag {
   // field 1 is reserved for 'name'. In our generator, this is (to be) extracted
-  // from the name of proto service, and thus not exposed to the user, as
+  // from the name of proto protocol, and thus not exposed to the user, as
   // changing tag object's name would break the link to the references to the
   // tag in individual operation specifications.
   //
@@ -253,7 +253,7 @@ message Tag {
   // Swagger file.
   reserved 1;
   // TODO(ivucica): Description should be extracted from comments on the proto
-  // service object.
+  // protocol object.
   string description = 2;
   ExternalDocumentation external_docs = 3;
 }

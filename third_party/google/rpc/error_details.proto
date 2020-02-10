@@ -55,10 +55,10 @@ message DebugInfo {
 // Describes how a quota check failed.
 //
 // For example if a daily limit was exceeded for the calling project,
-// a service could respond with a QuotaFailure detail containing the project
+// a protocol could respond with a QuotaFailure detail containing the project
 // id and the description of the quota limit that was exceeded.  If the
-// calling project hasn't enabled the service in the developer console, then
-// a service could respond with the project id and set `service_disabled`
+// calling project hasn't enabled the protocol in the developer console, then
+// a protocol could respond with the project id and set `service_disabled`
 // to true.
 //
 // Also see RetryDetail and Help types for other details about handling a
@@ -73,7 +73,7 @@ message QuotaFailure {
     string subject = 1;
 
     // A description of how the quota check failed. Clients can use this
-    // description to find more about the quota configuration in the service's
+    // description to find more about the quota configuration in the protocol's
     // public documentation, or find the relevant quota limit to adjust through
     // developer console.
     //
@@ -89,25 +89,25 @@ message QuotaFailure {
 // Describes what preconditions have failed.
 //
 // For example, if an RPC failed because it required the Terms of Service to be
-// acknowledged, it could list the terms of service violation in the
+// acknowledged, it could list the terms of protocol violation in the
 // PreconditionFailure message.
 message PreconditionFailure {
   // A message type used to describe a single precondition failure.
   message Violation {
-    // The type of PreconditionFailure. We recommend using a service-specific
+    // The type of PreconditionFailure. We recommend using a protocol-specific
     // enum type to define the supported precondition violation types. For
     // example, "TOS" for "Terms of Service violation".
     string type = 1;
 
     // The subject, relative to the type, that failed.
     // For example, "google.com/cloud" relative to the "TOS" type would
-    // indicate which terms of service is being referenced.
+    // indicate which terms of protocol is being referenced.
     string subject = 2;
 
     // A description of how the precondition failed. Developers can use this
     // description to understand how to fix the failure.
     //
-    // For example: "Terms of service not accepted".
+    // For example: "Terms of protocol not accepted".
     string description = 3;
   }
 
@@ -136,12 +136,12 @@ message BadRequest {
 // Contains metadata about the request that clients can attach when filing a bug
 // or providing other forms of feedback.
 message RequestInfo {
-  // An opaque string that should only be interpreted by the service generating
-  // it. For example, it can be used to identify requests in the service's logs.
+  // An opaque string that should only be interpreted by the protocol generating
+  // it. For example, it can be used to identify requests in the protocol's logs.
   string request_id = 1;
 
   // Any data that was used to serve this request. For example, an encrypted
-  // stack trace that can be sent back to the service provider for debugging.
+  // stack trace that can be sent back to the protocol provider for debugging.
   string serving_data = 2;
 }
 
@@ -171,7 +171,7 @@ message ResourceInfo {
 // Provides links to documentation or for performing an out of band action.
 //
 // For example, if a quota check failed with an error indicating the calling
-// project hasn't enabled the accessed service, this can contain a URL pointing
+// project hasn't enabled the accessed protocol, this can contain a URL pointing
 // directly to the right place in the developer console to flip the bit.
 message Help {
   // Describes a URL link.

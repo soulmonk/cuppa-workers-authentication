@@ -4,8 +4,7 @@ import (
 	"../config"
 	"../pkg"
 	"../pkg/db/pg"
-	"../pkg/services"
-	"../pkg/web/rest"
+	"../pkg/protocol/rest"
 	"log"
 )
 
@@ -16,7 +15,6 @@ func main() {
 	conf := config.Load()
 	pgDao := pg.GetDao(&conf.Pg)
 
-	app.Services = services.Init(pgDao)
 	app.Config = conf
 
 	defer func() {

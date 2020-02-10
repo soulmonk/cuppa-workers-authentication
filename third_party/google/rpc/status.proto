@@ -60,7 +60,7 @@ option objc_class_prefix = "RPC";
 //
 // Example uses of this error model include:
 //
-// - Partial errors. If a service needs to return partial errors to the client,
+// - Partial errors. If a protocol needs to return partial errors to the client,
 //     it may embed the `Status` in the normal response to indicate the partial
 //     errors.
 //
