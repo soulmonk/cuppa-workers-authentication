@@ -84,10 +84,23 @@ install-swagger-docker:
 	@echo "  > Installing swagger docker"
 	@docker pull swaggerapi/swagger-ui
 
-## starting swagger docker
+create-swagger-docker:
+	@docker create --name authentication-swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
+
+## running swagger docker
 run-swagger-docker:
 	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
-	@docker run --name swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v `pwd -LP`:/app swaggerapi/swagger-ui
+	@docker run -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
+
+## starting swagger docker
+start-swagger-docker:
+	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
+	@docker start authentication-swagger-ui
+
+## stopping swagger docker
+stop-swagger-docker:
+	@echo "  >  Stopping swagger docker"
+	@docker stop authentication-swagger-ui
 
 #go-clean:
 #	@echo "  >  Cleaning build cache"
