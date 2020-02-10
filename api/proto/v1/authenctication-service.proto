@@ -1,8 +1,6 @@
 syntax = "proto3";
 package v1;
 
-import "google/protobuf/timestamp.proto";
-import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
 option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
@@ -33,7 +31,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 
 message User {
     // Unique integer identifier of the user
-    int64 id = 1;
+    uint64 id = 1;
     // name of the user
     string username = 2;
     // email of the user
@@ -59,7 +57,7 @@ message SignUpResponse {
     string api = 1;
 
     // ID of created user
-    int64 id = 2;
+    uint64 id = 2;
 }
 
 
@@ -98,7 +96,7 @@ message ValidateResponse {
     string api = 1;
 
     // user id if valid
-    string id = 2;
+    uint64 id = 2;
 }
 
 // Service to manage list of todo tasks

@@ -23,11 +23,11 @@ func (dao *UserDao) Update(model *domain.User) error {
 }
 
 func (dao *UserDao) Create(model *domain.User) error {
-	query := `INSERT INTO "` + dao.tableName + `" (name, email, password, salt, enabled, created_at, updated_at)) 
-VALUES ($1, $2, $3, $4, false, now(), now()) RETURNING id, created_at, updated_at
+	query := `INSERT INTO "` + dao.tableName + `" (name, email, password, enabled, created_at, updated_at) 
+VALUES ($1, $2, $3, false, now(), now())
 RETURNING id, enabled, created_at, updated_at`
 	err := dao.db.
-		QueryRow(query, model.Name, model.Email, model.Password, model.Salt).
+		QueryRow(query, model.Name, model.Email, model.Password).
 		Scan(&model.ID, &model.Enabled, &model.CreatedAt, &model.UpdatedAt)
 
 	if err != nil {
@@ -88,10 +88,21 @@ func (dao *UserDao) FindById(id string) (*domain.User, error) {
 }
 
 func (dao *UserDao) Delete(id string) error {
-	query := `DELETE FROM "` + dao.tableName + `" WHERE id = $1`
+	query := `UPDATE "` + dao.tableName + `" SET enabled=False WHERE id = $1`
 	if _, err := dao.db.Exec(query, id); err != nil {
-		log.Println("Error on deleting note", err.Error())
+		log.Println("Error on deleting user", err.Error())
 		return err
 	}
 	return nil
+}
+
+func (dao *UserDao) FindByName(username string) (*domain.User, error) {
+	query := `SELECT * FROM "` + dao.tableName + `" where name = $1`
+	var model = domain.User{}
+
+	if err := dao.db.Get(&model, query, username); err != nil {
+		log.Println("Error on fetching user", err.Error())
+		return &model, err
+	}
+	return &model, nil
 }
