@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"../config"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
 )
 
 type Application struct {

@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"../domain"
 	"errors"
 	"github.com/jmoiron/sqlx"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg/domain"
 	"log"
 )
 

@@ -2,21 +2,16 @@ package cmd
 
 import (
 	"context"
-	"flag"
 	"fmt"
-	"github.com/jmoiron/sqlx"
-
-	//"github.com/jmoiron/sqlx" TODO
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/logger"
 	"log"
-
 	// postgres driver
 	_ "github.com/lib/pq"
-
-	"../../config"
-	"../db/pg"
-
-	"../protocol/grpc"
-	"../service/v1"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/grpc"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/rest"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/service/v1"
 )
 
 type PG struct {
@@ -53,6 +48,11 @@ func RunServer() error {
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	cfg := config.Load()
+
+	// initialize logger
+	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
+		return fmt.Errorf("failed to initialize logger: %v", err)
+	}
 	db := pg.GetDao(&cfg.Pg)
 
 	defer func() {
@@ -61,7 +61,7 @@ func RunServer() error {
 		}
 	}()
 
-	v1API := v1.NewAuthenticationServiceServer(db)
+	v1API := v1.NewAuthenticationServiceServer(db.GetDb())
 
 	// run HTTP gateway
 	go func() {

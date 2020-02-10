@@ -1,9 +1,9 @@
 package main
 
 import (
-	"../config"
-	"../pkg/db/pg"
-	"../pkg/db/pg/migration"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg/migration"
 	"log"
 )
 

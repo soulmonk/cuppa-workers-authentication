@@ -73,7 +73,7 @@ logs:
 ## build-server: Build grpc-server
 build-server:
 	@echo "  >  Build server"
-	@go build -o $(PROJ_BUILD_PATH)/server $(PROJ_BASE)/cmd/server/main.go
+	@go build -o $(PROJ_BUILD_PATH)/server $(PROJ_BASE)/cmd/server/server.go
 
 go-get:
 	@echo "  >  Checking if there is any missing dependencies..."

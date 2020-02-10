@@ -1,12 +1,12 @@
 package pg
 
 import (
-	"../../../config"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
 	"log"
 
-	"./repository"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg/repository"
 
 	_ "github.com/lib/pq"
 )
@@ -46,6 +46,10 @@ func GetDao(config *config.PG) *Dao {
 
 func (pg *Dao) Close() error {
 	return pg.db.Close()
+}
+
+func (pg *Dao) GetDb() *sqlx.DB {
+	return pg.db
 }
 
 func (pg *Dao) initConnection(config *config.PG) {

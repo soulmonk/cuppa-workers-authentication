@@ -1,8 +1,8 @@
 package main
 
 import (
-	"../../pkg/cmd"
 	"fmt"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/cmd"
 	"os"
 )
 

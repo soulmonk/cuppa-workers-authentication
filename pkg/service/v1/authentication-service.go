@@ -1,9 +1,9 @@
 package v1
 
 import (
-	"../../../pkg/api/v1"
 	"context"
 	"github.com/jmoiron/sqlx"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

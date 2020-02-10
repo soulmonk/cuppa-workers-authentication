@@ -2,7 +2,11 @@ package rest
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/logger"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/rest/middleware"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -17,15 +21,16 @@ func RunServer(ctx context.Context, httpPort string) error {
 
 	r.HandleFunc("/api/status", status).Methods("GET")
 
-	//addr := ":" + app.Config.Port
-	//log.Println("listen on", addr)
+	addr := ":" + httpPort
+	log.Println("listen on", addr)
 	//if err := http.ListenAndServe(addr, r); err != nil {
 	//	log.Fatal(err)
 	//}
 
 	srv := &http.Server{
-		Addr:    ":" + httpPort,
-		Handler: r,
+		Addr: ":" + httpPort,
+		Handler: middleware.AddRequestID(
+			middleware.AddLogger(logger.Log, r)),
 	}
 
 	// graceful shutdown
@@ -53,5 +58,18 @@ type statusResponse struct {
 
 func status(w http.ResponseWriter, r *http.Request) {
 	var data = statusResponse{"ok"}
-	response.RespondWithJson(w, http.StatusOK, data)
+	RespondWithJson(w, http.StatusOK, data)
+}
+
+func RespondWithError(w http.ResponseWriter, code int, msg string) {
+	RespondWithJson(w, code, map[string]string{"error": msg})
+}
+
+func RespondWithJson(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	if _, err := w.Write(response); err != nil {
+		log.Fatal("Error write response: ", err.Error())
+	}
 }
