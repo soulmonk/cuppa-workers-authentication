@@ -79,6 +79,16 @@ go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
 	@go get $(get)
 
+## install swagger-docker
+install-swagger-docker:
+	@echo "  > Installing swagger docker"
+	@docker pull swaggerapi/swagger-ui
+
+## starting swagger docker
+run-swagger-docker:
+	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
+	@docker run --name swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v `pwd -LP`:/app swaggerapi/swagger-ui
+
 #go-clean:
 #	@echo "  >  Cleaning build cache"
 #	@go clean $(PROJ_BUILD_PATH)
