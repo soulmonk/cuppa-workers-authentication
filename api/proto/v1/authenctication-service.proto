@@ -9,7 +9,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
         version: "1.0";
         contact: {
             name: "cuppa/cuppa-workers/authentication project";
-            url: "https://github.com/soulmonk/cuppa/cuppa-workers/authentication";
+            url: "https://github.com/soulmonk/cuppa-workers-authentication";
             email: "fsoulmonk@gmail.com";
         };
     };
