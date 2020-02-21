@@ -42,7 +42,7 @@ var config Config
 // read and parse the configuration file
 func (c *Config) read() {
 	var configPath string
-	flag.StringVar(&configPath, "config path", "./config.json", "gRPC port to bind")
+	flag.StringVar(&configPath, "config-path", "./config.json", "gRPC port to bind")
 	flag.Parse()
 	// TODO relevant path to the runner (app)
 	file, e := ioutil.ReadFile(configPath)
