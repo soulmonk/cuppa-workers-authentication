@@ -43,6 +43,6 @@ func RunServer(ctx context.Context, v1API v1.AuthenticationServiceServer, port s
 	}()
 
 	// start gRPC server
-	logger.Log.Info("starting gRPC server...")
+	logger.Log.Info("starting gRPC server... at :" + port)
 	return server.Serve(listen)
 }
