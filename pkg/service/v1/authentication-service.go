@@ -66,7 +66,6 @@ func (s *authenticationServiceServer) SignUp(ctx context.Context, req *v1.SignUp
 	if err != nil {
 		return nil, err
 	}
-	req.Password = string(hashedPass)
 	var user = domain.User{Name: req.Username, Email: req.Email, Password: string(hashedPass)}
 	if err := s.dao.UserDao.Create(&user); err != nil {
 		return nil, err
