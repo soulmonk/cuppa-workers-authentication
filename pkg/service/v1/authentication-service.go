@@ -61,6 +61,11 @@ func (s *authenticationServiceServer) SignUp(ctx context.Context, req *v1.SignUp
 		return nil, err
 	}
 
+	if _, err := s.dao.UserDao.FindByName(req.Username); err == nil {
+		return nil, status.Errorf(codes.AlreadyExists,
+			"user '%s' already exists", req.Username)
+	}
+
 	// Generates a hashed version of our password
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
