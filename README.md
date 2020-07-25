@@ -1,10 +1,16 @@
 # Authentication service
 Install packages
-* tbd
+- `make install`
 
 Build application
-`go build -o build/app cmd/app.go`
+- `make buil-all`
+
+Run application
+- `make run-server`
 
 ## TODO
 - use go mod
 - ??? user id in login response
+
+## docker
+- ```docker run -it -v `pwd`:/app -w /app golang bash``` in power shell`${PWD}` instead `pwd` 

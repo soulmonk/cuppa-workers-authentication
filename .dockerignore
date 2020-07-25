@@ -1,0 +1,3 @@
+go.sum
+pkg/api/v1/*
+api/swagger/v1/*
