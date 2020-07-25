@@ -8,7 +8,6 @@ import (
 	"os"
 )
 
-// todo required camelcase, do not now yet why
 type PG struct {
 	Host     string
 	Port     string
@@ -42,7 +41,8 @@ var config Config
 // read and parse the configuration file
 func (c *Config) read() {
 	var configPath string
-	flag.StringVar(&configPath, "config-path", "./config.json", "gRPC port to bind")
+	// TODO override with environment variables
+	flag.StringVar(&configPath, "config-path", "./config.json", "Config file")
 	flag.Parse()
 	// TODO relevant path to the runner (app)
 	file, e := ioutil.ReadFile(configPath)

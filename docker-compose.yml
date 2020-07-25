@@ -1,0 +1,22 @@
+version: '3.2'
+
+services:
+  cuppa-workers-authentication:
+    image: cuppa-workers-authentication:latest
+    container_name: cuppa-workers-authentication
+    environment:
+      - FASTIFY_PORT=3030
+    networks:
+      - cuppa-network
+    expose:
+      - 51101
+      - 9090
+    ports:
+      - 51101:51101
+      - 9090:9090
+
+
+networks:
+  cuppa-network:
+    external:
+      name: "cuppa-network"

@@ -1,5 +1,8 @@
 syntax = "proto3";
+
 package v1;
+
+option go_package = "github.com/soulmonk/cuppa-workers-authentication;v1";
 
 import "protoc-gen-swagger/options/annotations.proto";
 
@@ -99,7 +102,7 @@ message ValidateResponse {
     uint64 id = 2;
 }
 
-// Service to manage list of todo tasks
+// Service to manage user Authentication/Authorization
 service AuthenticationService {
 
     // SignUp user

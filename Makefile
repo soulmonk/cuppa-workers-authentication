@@ -16,10 +16,20 @@ STDOUT := /tmp/.$(PROJECT_NAME)-stdout.txt
 ## install: Install missing dependencies. Runs `go get` internally. e.g; make install get=github.com/foo/bar
 install: go-get
 
+## go-mod-init: Download dependencies
+go-mod-init:
+	@echo " > Download dependencies"
+	@go mod download
+	@echo " NOTE: without this installation: event if in go.mod, could not gen proto"
+	@go get github.com/golang/protobuf/protoc-gen-go \
+		google.golang.org/grpc/cmd/protoc-gen-go-grpc \
+		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
+		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+
 ## init: Simple initialization. Make `third_party/protoc-gen.sh` executable
 init:
 	@echo " > Simple initialization"
-	@echo " >> Make `third_party/protoc-gen.sh` executable"
+	@echo " >> Make 'third_party/protoc-gen.sh' executable"
 	@chmod +x $(PROJ_BASE)/third_party/protoc-gen.sh
 
 ## clean: Clean build files.
@@ -56,7 +66,7 @@ run-server:
 	@$(PROJ_BUILD_PATH)/server $(RUN_OPTIONS)
 
 start-server: stop-server
-	@echo "  >  stoping server"
+	@echo "  >  start server"
 	@-$(PROJ_BUILD_PATH)/server $(RUN_OPTIONS) 2>$(STDOUT) & echo $$! > $(PID)
 	@cat $(PID) | sed "/^/s/^/  \>  PID: /"
 	@echo "  >  stoud at $(STDOUT)"
