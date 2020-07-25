@@ -13,8 +13,8 @@ STDERR := /tmp/.$(PROJECT_NAME)-stderr.txt
 # Redirect error output to a file, so we can show it in development mode.
 STDOUT := /tmp/.$(PROJECT_NAME)-stdout.txt
 
-## install: Install missing dependencies. Runs `go get` internally. e.g; make install get=github.com/foo/bar
-install: go-get
+## install: init
+install: init go-mod-init
 
 ## go-mod-init: Download dependencies
 go-mod-init:

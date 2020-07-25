@@ -1,17 +1,20 @@
 FROM golang
 
-RUN apt-get update && apt-get -y upgrade
-RUN apt-get -y install autoconf automake libtool curl make g++ unzip  protobuf-compiler
+RUN apt-get update && apt-get -y upgrade && \
+ apt-get -y install protobuf-compiler
 
 # Create app directory
 WORKDIR /usr/src/app
 
+# easy rebuild?
+COPY third_party/protoc-gen.sh ./third_party/protoc-gen.sh
+COPY go.mod Makefile ./
+
+RUN make install
+
 # Bundle app source
 COPY . .
 
-#RUN go mod cuppa-workers-authentication
-RUN make init
-RUN make go-mod-init
 RUN make build-all
 
 CMD [ "make", "run-server" ]
