@@ -13,4 +13,5 @@ Run application
 - ??? user id in login response
 
 ## docker
-- ```docker run -it -v `pwd`:/app -w /app golang bash``` in power shell`${PWD}` instead `pwd` 
+- ```docker run -it -v `pwd`:/app -w /app golang bash``` in power shell`${PWD}` instead `pwd`
+- `docker build -t cuppa-workers-authentication .`
