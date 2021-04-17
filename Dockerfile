@@ -3,6 +3,8 @@ FROM golang
 RUN apt-get update && apt-get -y upgrade && \
  apt-get -y install protobuf-compiler
 
+RUN PATH="$GOPATH/bin:$PATH"
+
 # Create app directory
 WORKDIR /usr/src/app
 
@@ -10,6 +12,7 @@ WORKDIR /usr/src/app
 COPY third_party/protoc-gen.sh ./third_party/protoc-gen.sh
 COPY go.mod Makefile ./
 
+RUN make clean
 RUN make install
 
 # Bundle app source

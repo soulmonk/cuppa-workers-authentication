@@ -1,3 +1,6 @@
 go.sum
+build/
 pkg/api/v1/*
 api/swagger/v1/*
+.idea
+build/
