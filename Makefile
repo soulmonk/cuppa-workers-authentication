@@ -25,12 +25,15 @@ go-mod-init:
 		google.golang.org/grpc/cmd/protoc-gen-go-grpc \
 		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
 		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+	@export PATH="$PATH:$(go env GOPATH)/bin"
 
 ## init: Simple initialization. Make `third_party/protoc-gen.sh` executable
 init:
 	@echo " > Simple initialization"
 	@echo " >> Make 'third_party/protoc-gen.sh' executable"
 	@chmod +x $(PROJ_BASE)/third_party/protoc-gen.sh
+	@-mkdir -p pkg/api/v1
+	@-mkdir -p api/swagger/v1
 
 ## clean: Clean build files.
 #clean:
@@ -83,7 +86,7 @@ logs:
 ## build-server: Build grpc-server
 build-server:
 	@echo "  >  Build server"
-	@go build -o $(PROJ_BUILD_PATH)/server $(PROJ_BASE)/cmd/server/server.go
+	go build -o $(PROJ_BUILD_PATH)/server $(PROJ_BASE)/cmd/server/server.go
 
 go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
