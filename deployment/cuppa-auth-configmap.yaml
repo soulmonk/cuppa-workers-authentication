@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cuppa-auth-worker-config
+  labels:
+    app: auth-worker
+data:
+  PORT: "3030"
+  POSTGRESQL_CONNECTION_STRING: "postgres://cuppa:password@rpisoulv1.kube:5432/cuppa-authentication?sslmode=disable"

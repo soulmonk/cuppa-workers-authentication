@@ -88,6 +88,11 @@ build-server:
 	@echo "  >  Build server"
 	go build -o $(PROJ_BUILD_PATH)/server $(PROJ_BASE)/cmd/server/server.go
 
+## build-migration: Build migration
+build-migration:
+	@echo "  >  Build server"
+	go build -o $(PROJ_BUILD_PATH)/migration $(PROJ_BASE)/cmd/migration.go
+
 go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
 	@go get $(get)

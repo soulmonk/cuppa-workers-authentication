@@ -1,4 +1,4 @@
-FROM golang
+FROM golang:alpine as build
 
 RUN apt-get update && apt-get -y upgrade && \
  apt-get -y install protobuf-compiler
@@ -20,4 +20,6 @@ COPY . .
 
 RUN make build-all
 
-CMD [ "make", "run-server" ]
+FROM gcr.io/distroless/base-debian10
+COPY --from=build /usr/src/app/build/ /
+CMD [ "/run-server" ]
