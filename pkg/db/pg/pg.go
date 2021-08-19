@@ -18,12 +18,6 @@ type Dao struct {
 
 func InitConnection(connectionString string) *sqlx.DB {
 	var err error
-	//psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
-	//	"password=%s dbname=%s sslmode=disable",
-	//	config.Host, config.Port,
-	//	config.User, config.Password, config.Dbname)
-
-	fmt.Println(connectionString)
 
 	db, err := sqlx.Open("postgres", connectionString)
 	if err != nil {
