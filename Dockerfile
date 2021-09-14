@@ -17,7 +17,9 @@ RUN make install
 # Bundle app source
 COPY . .
 
-RUN make build-all
+#RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/server cmd/server/server.go
+#GOARCH=arm64
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o build/server cmd/server/server.go
 
 #FROM gcr.io/distroless/base-debian10
 #WORKDIR /
@@ -27,8 +29,8 @@ RUN make build-all
 
 FROM golang:1.16.7-alpine
 
-WORKDIR /usr/src/app/
+WORKDIR /
 
-COPY --from=build /usr/src/app/build/server /usr/src/app/server
+COPY --from=build /usr/src/app/build/server /server
 
-CMD [ "/usr/src/app/server" ]
+CMD [ "/server" ]
