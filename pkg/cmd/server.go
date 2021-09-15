@@ -26,7 +26,7 @@ func RunServer() error {
 	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
 		return fmt.Errorf("failed to initialize logger: %v", err)
 	}
-	dao := pg.GetDao(&cfg.Pg)
+	dao := pg.GetDao(cfg.PostgresqlConnectionString)
 
 	defer func() {
 		if err := dao.Close(); err != nil {

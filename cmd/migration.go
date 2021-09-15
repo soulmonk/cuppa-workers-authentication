@@ -12,7 +12,7 @@ func main() {
 	log.Println("Starting migration")
 	cfg := config.Load()
 
-	db := pg.InitConnection(&cfg.Pg)
+	db := pg.InitConnection(cfg.PostgresqlConnectionString)
 
 	defer func() {
 		if err := db.Close(); err != nil {

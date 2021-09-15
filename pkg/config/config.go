@@ -1,20 +1,10 @@
 package config
 
 import (
-	"encoding/json"
-	"flag"
-	"io/ioutil"
-	"log"
+	"github.com/joho/godotenv"
 	"os"
+	"strconv"
 )
-
-type PG struct {
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Dbname   string
-}
 
 // Represents database server and credentials
 type Config struct {
@@ -26,42 +16,41 @@ type Config struct {
 	// HTTPPort is TCP port to listen by HTTP/REST gateway
 	HTTPPort string
 
-	Pg PG
-
 	// Log parameters section
 	// LogLevel is global log level: Debug(-1), Info(0), Warn(1), Error(2), DPanic(3), Panic(4), Fatal(5)
 	LogLevel int
 	// LogTimeFormat is print time format for logger e.g. 2006-01-02T15:04:05Z07:00
-	LogTimeFormat string
+	LogTimeFormat              string
+	PostgresqlConnectionString string
 }
 
 // TODO application.Config vs config.Get()
 var config Config
 
-// read and parse the configuration file
-func (c *Config) read() {
-	var configPath string
-	// TODO override with environment variables
-	flag.StringVar(&configPath, "config-path", "./config.json", "Config file")
-	flag.Parse()
-	// TODO relevant path to the runner (app)
-	file, e := ioutil.ReadFile(configPath)
-	if e != nil {
-		log.Fatal(e)
-		os.Exit(1)
-	}
-
-	var err = json.Unmarshal(file, &c)
-	if err != nil {
-		log.Fatal("Cannot unmarshal the json ", err)
-	}
-}
-
 func Load() *Config {
-	config = Config{}
-	config.read()
+	// load .env file from given path
+	// we keep it empty it will load .env from current directory
+	// if no file it's okay
+	_ = godotenv.Load(".env")
+
+	logLevel, _ := strconv.Atoi(getEnv("LOG_LEVEL", "-1"))
+	config = Config{
+		GRPCPort:                   getEnv("GRPC_PORT", "9090"),
+		HTTPPort:                   getEnv("HTTP_PORT", "51101"),
+		LogLevel:                   logLevel,
+		LogTimeFormat:              getEnv("LOG_TIME_FORMAT", "2006-01-02T15:04:05.999999999Z07:00"),
+		PostgresqlConnectionString: getEnv("POSTGRESQL_CONNECTION_STRING", "postgres://cuppa:password@localhost:5432/cuppa-authentication?sslmode=disable"),
+	}
 
 	return Get()
+}
+
+func getEnv(key string, def string) string {
+	v := os.Getenv(key)
+	if v == "" {
+		return def
+	}
+	return v
 }
 
 func Get() *Config {

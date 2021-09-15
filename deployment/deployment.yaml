@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: workers-authentication
+  labels:
+    app: workers-authentication
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: workers-authentication
+  template:
+    metadata:
+      labels:
+        app: workers-authentication
+    spec:
+      containers:
+        - name: cuppa-workers-authentication
+          image: cuppa/workers-authentication:v2
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 9090
+            - containerPort: 51101
+          envFrom:
+            - configMapRef:
+                name: cuppa-workers-authentication-config
+          resources:
+            limits:
+              memory: "128Mi"
+            requests:
+              memory: "32Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: workers-authentication
+  labels:
+    app: auth
+spec:
+  type: NodePort
+  ports:
+    - port: 9090
+      nodePort: 30090
+  selector:
+    app: workers-authentication

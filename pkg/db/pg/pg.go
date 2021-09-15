@@ -3,7 +3,6 @@ package pg
 import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
 	"log"
 
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg/repository"
@@ -17,14 +16,10 @@ type Dao struct {
 	db                  *sqlx.DB
 }
 
-func InitConnection(config *config.PG) *sqlx.DB {
+func InitConnection(connectionString string) *sqlx.DB {
 	var err error
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		config.Host, config.Port,
-		config.User, config.Password, config.Dbname)
 
-	db, err := sqlx.Open("postgres", psqlInfo)
+	db, err := sqlx.Open("postgres", connectionString)
 	if err != nil {
 		panic(err)
 	}
@@ -36,9 +31,9 @@ func InitConnection(config *config.PG) *sqlx.DB {
 	return db
 }
 
-func GetDao(config *config.PG) *Dao {
+func GetDao(connectionString string) *Dao {
 	dao := Dao{}
-	dao.initConnection(config)
+	dao.initConnection(connectionString)
 	dao.initModels()
 
 	return &dao
@@ -52,8 +47,8 @@ func (pg *Dao) GetDb() *sqlx.DB {
 	return pg.db
 }
 
-func (pg *Dao) initConnection(config *config.PG) {
-	pg.db = InitConnection(config)
+func (pg *Dao) initConnection(connectionString string) {
+	pg.db = InitConnection(connectionString)
 
 	fmt.Println("Successfully connected!")
 }

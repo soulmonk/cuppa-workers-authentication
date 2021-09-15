@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cuppa-workers-authentication-config
+  labels:
+    app: workers-authentication
+data:
+  GRPC_PORT: "9090"
+  HTTP_PORT: "51101"
+  POSTGRESQL_CONNECTION_STRING: "postgres://cuppa:password@postgres:5432/cuppa-authentication?sslmode=disable"
