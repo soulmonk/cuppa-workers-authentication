@@ -2,7 +2,7 @@ package v1
 
 import (
 	"context"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/v1"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg/domain"
