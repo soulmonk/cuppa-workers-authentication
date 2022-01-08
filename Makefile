@@ -13,11 +13,16 @@ STDERR := /tmp/.$(PROJECT_NAME)-stderr.txt
 # Redirect error output to a file, so we can show it in development mode.
 STDOUT := /tmp/.$(PROJECT_NAME)-stdout.txt
 
-## install: init
-install: init go-mod-init
+GREEN  := $(shell tput -Txterm setaf 2)
+YELLOW := $(shell tput -Txterm setaf 3)
+WHITE  := $(shell tput -Txterm setaf 7)
+CYAN   := $(shell tput -Txterm setaf 6)
+RESET  := $(shell tput -Txterm sgr0)
 
-## go-mod-init: Download dependencies
-go-mod-init:
+## Install:
+install: init go-mod-init ## run "init" "go-mod-init"
+
+go-mod-init: ## Download dependencies
 	@echo " > Download dependencies"
 	@go mod download
 	@echo " NOTE: without this installation: event if in go.mod, could not gen proto"
@@ -27,19 +32,17 @@ go-mod-init:
 		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 	@export PATH="$PATH:$(go env GOPATH)/bin"
 
-## init: Simple initialization. Make `third_party/protoc-gen.sh` executable
-init:
+init: ## Simple initialization. Make `third_party/protoc-gen.sh` executable
 	@echo " > Simple initialization"
 	@echo " >> Make 'third_party/protoc-gen.sh' executable"
 	@chmod +x $(PROJ_BASE)/third_party/protoc-gen.sh
 	@-mkdir -p pkg/api/v1
 	@-mkdir -p api/swagger/v1
 
-## clean: Clean build files.
 #clean:
 #	@echo "  >  Clean build files. Runs `go clean` internally."
 #	@-$(MAKE) clean-build clean-proto go-clean
-clean:
+clean: ## Clean build files.
 	@echo "  >  Clean build files."
 	@-$(MAKE) clean-build clean-proto
 
@@ -53,18 +56,15 @@ clean-proto:
 	@-rm -f $(PROJ_BASE)/pkg/api/v1/*.pb.* 2> /dev/null
 	@echo
 
-## gen-proto: Generate proto
-gen-proto:
+gen-proto: ## Generate proto
 	@echo "  >  Generate proto"
 	@$(shell $(PROJ_BASE)/third_party/protoc-gen.sh)
 
-## build-all: Runs `gen-proto` `build-server` `c`
-build-all:
+build-all: ## Runs `gen-proto` `build-server` `c`
 	@echo "  >  Build all"
 	@-$(MAKE) gen-proto build-server
 
-## run-server: RUN_OPTIONS='-grpc-port= -http-port= -db-host= --db-port= -db-user= -db-password= -db-name= -log-level=-1 -log-time-format=2006-01-02T15:04:05.999999999Z07:00'
-run-server:
+run-server: ## RUN_OPTIONS='-grpc-port= -http-port= -db-host= --db-port= -db-user= -db-password= -db-name= -log-level=-1 -log-time-format=2006-01-02T15:04:05.999999999Z07:00'
 	@echo "  >  Running server"
 	@$(PROJ_BUILD_PATH)/server $(RUN_OPTIONS)
 
@@ -83,13 +83,11 @@ stop-server:
 logs:
 	@tail -f -n 100 $(STDOUT)
 
-## build-server: Build grpc-server
-build-server:
+build-server: ## Build grpc-server
 	@echo "  >  Build server"
 	go build -o $(PROJ_BUILD_PATH)/server $(PROJ_BASE)/cmd/server/server.go
 
-## build-migration: Build migration
-build-migration:
+build-migration: ## Build migration
 	@echo "  >  Build server"
 	go build -o $(PROJ_BUILD_PATH)/migration $(PROJ_BASE)/cmd/migration.go
 
@@ -97,27 +95,23 @@ go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
 	@go get $(get)
 
-## install-swagger-docker: install swagger-docker
-install-swagger-docker:
+## Docker:
+install-swagger-docker: ## install swagger-docker
 	@echo "  > Installing swagger docker"
 	@docker pull swaggerapi/swagger-ui
 
-## create-swagger-docker: create docker container "authentication-swagger-ui"
-create-swagger-docker:
+create-swagger-docker: ## create docker container "authentication-swagger-ui"
 	@docker create --name authentication-swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
 
-## run-swagger-docker: running swagger docker
-run-swagger-docker:
+run-swagger-docker: ## running swagger docker
 	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
 	@docker run -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
 
-## start-swagger-docker: starting swagger docker
-start-swagger-docker:
+start-swagger-docker: ## starting swagger docker
 	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
 	@docker start authentication-swagger-ui
 
-## stop-swagger-docker: stopping swagger docker
-stop-swagger-docker:
+stop-swagger-docker: ## stopping swagger docker
 	@echo "  >  Stopping swagger docker"
 	@docker stop authentication-swagger-ui
 
@@ -125,11 +119,17 @@ stop-swagger-docker:
 #	@echo "  >  Cleaning build cache"
 #	@go clean $(PROJ_BUILD_PATH)
 
+.DEFAULT_GOAL := help
 .PHONY: help
 all: help
-help: Makefile
-	@echo
-	@echo " Choose a command run in "$(PROJECT_NAME)":"
-	@echo
-	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
-	@echo
+## Help:
+help: ## Show this help.
+	@echo ''
+	@echo 'Usage:'
+	@echo '  ${YELLOW}make${RESET} ${GREEN}<target>${RESET}'
+	@echo ''
+	@echo 'Targets:'
+	@awk 'BEGIN {FS = ":.*?## "} { \
+		if (/^[a-zA-Z_-]+:.*?##.*$$/) {printf "    ${YELLOW}%-24s${GREEN}%s${RESET}\n", $$1, $$2} \
+		else if (/^## .*$$/) {printf "  ${CYAN}%s${RESET}\n", substr($$1,4)} \
+		}' $(MAKEFILE_LIST)
