@@ -43,23 +43,23 @@ func main() {
 	//	log.Fatalf("Create failed: %v", err)
 	//}
 	//log.Printf("Create result: <%+v>\n\n", res1)
-	//
-	//// Login
-	//req2 := v1.LoginRequest{
-	//	Api: apiVersion,
-	//	Username:  "username",
-	//	Password: "plainpassword",
-	//}
-	//res2, err := c.Login(ctx, &req2)
-	//if err != nil {
-	//	log.Fatalf("Login failed: %v", err)
-	//}
-	//log.Printf("Login result: <%+v>\n\n", res2)
+
+	// Login
+	req2 := v1.LoginRequest{
+		Api:      apiVersion,
+		Username: "username",
+		Password: "plainpassword",
+	}
+	res2, err := c.Login(ctx, &req2)
+	if err != nil {
+		log.Fatalf("Login failed: %v", err)
+	}
+	log.Printf("Login result: <%+v>\n\n", res2)
 
 	// Validate
 	req3 := v1.ValidateRequest{
 		Api:   apiVersion,
-		Token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODE2MTg0MTQsImlhdCI6MTU4MTM1OTIxNCwiaXNzIjoiYXV0aC5zZXJ2aWNlIiwic3ViIjoiMSJ9.LslRXxF2kowhQLYUwcu51ypTUa_2p3IXGP2yrRU9XGQ",
+		Token: res2.Token,
 	}
 	res3, err := c.Validate(ctx, &req3)
 	if err != nil {

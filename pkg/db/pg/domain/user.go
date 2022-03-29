@@ -25,7 +25,7 @@ func (u NullUUID) Value() (driver.Value, error) {
 }
 
 // Scan implements the sql.Scanner interface.
-func (u *NullUUID) Scan(src interface{}) error {
+func (u *NullUUID) Scan(src any) error {
 	if src == nil {
 		u.UUID, u.Valid = Nil, false
 		return nil
