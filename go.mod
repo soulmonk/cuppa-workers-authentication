@@ -1,6 +1,6 @@
 module github.com/soulmonk/cuppa-workers-authentication
 
-go 1.17
+go 1.18
 
 require (
 	github.com/golang-jwt/jwt/v4 v4.1.0
@@ -14,13 +14,15 @@ require (
 	go.uber.org/zap v1.13.0
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
 	google.golang.org/grpc v1.33.1
-	google.golang.org/protobuf v1.26.0
+	google.golang.org/protobuf v1.27.1
 )
 
 require (
 	github.com/BurntSushi/toml v0.3.1 // indirect
+	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
@@ -35,6 +37,7 @@ require (
 	golang.org/x/text v0.3.3 // indirect
 	golang.org/x/tools v0.0.0-20200207224406-61798d64f025 // indirect
 	google.golang.org/genproto v0.0.0-20200724131911-43cab4749ae7 // indirect
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	honnef.co/go/tools v0.0.1-2019.2.3 // indirect
 )

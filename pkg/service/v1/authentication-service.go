@@ -121,7 +121,7 @@ func (s *authenticationServiceServer) Validate(ctx context.Context, req *v1.Vali
 		return nil, err
 	}
 	// Parse the token
-	token, err := jwt.ParseWithClaims(req.Token, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(req.Token, &jwt.StandardClaims{}, func(token *jwt.Token) (any, error) {
 		return key, nil
 	})
 

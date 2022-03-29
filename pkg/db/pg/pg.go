@@ -69,7 +69,7 @@ func (pg *Dao) Delete(from string, id string, modelName string) error {
 }
 
 // TODO not used circular because dependency
-func (pg *Dao) FindMyId(from string, id string, model *interface{}, modelName string) error {
+func (pg *Dao) FindMyId(from string, id string, model *any, modelName string) error {
 	query := `SELECT * FROM "` + from + `" WHERE id = $1`
 	if err := pg.db.Get(model, query, id); err != nil {
 		log.Println("Error on fetching "+modelName, err.Error())
