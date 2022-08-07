@@ -4,3 +4,4 @@ api/swagger/v1/*
 .idea
 build/
 .env
+config.json

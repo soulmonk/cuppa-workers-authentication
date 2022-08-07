@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/v1"
 	"google.golang.org/grpc"
 	"log"
@@ -17,7 +18,12 @@ const (
 func main() {
 	// get configuration
 	address := flag.String("server", ":9090", "gRPC server in format host:port")
+	username := flag.String("username", "", "username")
+	password := flag.String("password", "", "plain password")
+	email := flag.String("email", "", "used in signup")
 	flag.Parse()
+
+	fmt.Printf("Email: \"%s\" \n", *email)
 
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(*address, grpc.WithInsecure())
@@ -34,9 +40,9 @@ func main() {
 	//// Call Create
 	//req1 := v1.SignUpRequest{
 	//	Api: apiVersion,
-	//	Username: "username",
-	//	Email: "username@example.com",
-	//	Password: "plainpassword",
+	//	Username: username,
+	//	Email: email,
+	//	Password: password,
 	//}
 	//res1, err := c.SignUp(ctx, &req1)
 	//if err != nil {
@@ -47,8 +53,8 @@ func main() {
 	// Login
 	req2 := v1.LoginRequest{
 		Api:      apiVersion,
-		Username: "username",
-		Password: "plainpassword",
+		Username: *username,
+		Password: *password,
 	}
 	res2, err := c.Login(ctx, &req2)
 	if err != nil {
