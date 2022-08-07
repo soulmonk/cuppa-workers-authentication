@@ -26,7 +26,7 @@ go-mod-init: ## Download dependencies
 	@echo " > Download dependencies"
 	@go mod download
 	@echo " NOTE: without this installation: event if in go.mod, could not gen proto"
-	@go get github.com/golang/protobuf/protoc-gen-go \
+	@go get google.golang.org/protobuf \
 		google.golang.org/grpc/cmd/protoc-gen-go-grpc \
 		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway \
 		github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
@@ -94,6 +94,13 @@ build-migration: ## Build migration
 go-get:
 	@echo "  >  Checking if there is any missing dependencies..."
 	@go get $(get)
+
+show-up-deps: ## view available dependency upgrades
+	@go list -u -m all
+
+go-update-mod-version: ### Update go version
+	@echo " > Update go version to $(go_version)"
+	@go mod edit -go $(go_version)
 
 ## Docker:
 install-swagger-docker: ## install swagger-docker

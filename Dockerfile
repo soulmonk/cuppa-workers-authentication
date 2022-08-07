@@ -1,4 +1,4 @@
-FROM golang:1.17.2-alpine as build
+FROM golang:1.19-alpine as build
 
 RUN apk update && apk add bash make protoc && rm -rf /var/cache/apk/*
 
@@ -27,7 +27,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o build/server cmd/server/se
 #USER nonroot:nonroot
 #CMD [ "/server" ]
 
-FROM golang:1.17.2-alpine
+FROM golang:1.19-alpine
 
 WORKDIR /
 
