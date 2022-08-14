@@ -3,15 +3,13 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/db"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/logger"
-	"log"
-	// postgres driver
-	_ "github.com/lib/pq"
-	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/grpc"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/rest"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/service/v1"
+	"log"
 )
 
 // RunServer runs gRPC server and HTTP gateway
