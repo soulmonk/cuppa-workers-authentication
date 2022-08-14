@@ -9,8 +9,9 @@ import (
 )
 
 type Querier interface {
+	Activate(ctx context.Context, id int64) error
 	Create(ctx context.Context, arg CreateParams) (CreateRow, error)
-	DeleteUser(ctx context.Context, id int64) error
+	Delete(ctx context.Context, id int64) error
 	FindById(ctx context.Context, id int64) (User, error)
 	FindByName(ctx context.Context, name string) (User, error)
 	List(ctx context.Context) ([]ListRow, error)

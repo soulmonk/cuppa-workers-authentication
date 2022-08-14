@@ -60,6 +60,12 @@ gen-proto: ## Generate proto
 	@echo "  >  Generate proto"
 	@$(shell $(PROJ_BASE)/third_party/protoc-gen.sh)
 
+
+gen-db: ## Generate go from sql
+	@sqlc generate
+
+
+
 build-all: ## Runs `gen-proto` `build-server` `c`
 	@echo "  >  Build all"
 	@-$(MAKE) gen-proto build-server
@@ -90,6 +96,10 @@ build-server: ## Build grpc-server
 build-migration: ## Build migration
 	@echo "  >  Build server"
 	go build -o $(PROJ_BUILD_PATH)/migration $(PROJ_BASE)/cmd/migration.go
+
+build-grpc-client: ## Build grpc client
+	@echo " > Build Grpc Client"
+	 go build -o $(PROJ_BUILD_PATH)/client-grpc $(PROJ_BASE)/cmd/client-grpc/main.go
 
 go-get:
 	@echo "  >  Checking if there is any missing dependencies..."

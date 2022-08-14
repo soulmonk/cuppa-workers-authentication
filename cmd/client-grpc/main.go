@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -21,6 +22,7 @@ const (
 	usernameFlag = "username"
 	emailFlag    = "email"
 	serverFlag   = "server"
+	userIdFlag   = "id"
 )
 
 var rootCmd = &cobra.Command{
@@ -60,6 +62,32 @@ var signupCmd = &cobra.Command{
 		doSignUp(ctx, conn, username, email)
 	},
 }
+var activateCmd = &cobra.Command{
+	Use:   "activate",
+	Short: "activate user",
+	Run: func(cmd *cobra.Command, args []string) {
+		id := cmd.Flag(userIdFlag).Value.String()
+		server := cmd.Flag(serverFlag).Value.String()
+
+		conn, ctx, cancel := createConnection(server)
+
+		defer func(conn *grpc.ClientConn) {
+			err := conn.Close()
+			if err != nil {
+				log.Fatalln("Could not close conn")
+			}
+		}(conn)
+		defer cancel()
+
+		uid, err := strconv.ParseInt(id, 10, 64)
+		if err != nil {
+			// todo log
+			fmt.Printf("Cannot parse id: %s", id)
+			return
+		}
+		doActivate(ctx, conn, uid)
+	},
+}
 var validateTokenCmd = &cobra.Command{
 	Use:   "validate",
 	Short: "validate user token",
@@ -81,6 +109,9 @@ func main() {
 	loginCmd.Flags().StringP(usernameFlag, "u", "", "username")
 	_ = loginCmd.MarkFlagRequired(usernameFlag)
 
+	activateCmd.Flags().Int64(userIdFlag, 0, "user id")
+	_ = activateCmd.MarkFlagRequired(userIdFlag)
+
 	signupCmd.Flags().StringP(usernameFlag, "u", "", "username")
 	signupCmd.Flags().StringP(emailFlag, "e", "", "email")
 	_ = signupCmd.MarkFlagRequired(usernameFlag)
@@ -89,6 +120,7 @@ func main() {
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(signupCmd)
 	rootCmd.AddCommand(validateTokenCmd)
+	rootCmd.AddCommand(activateCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -103,7 +135,7 @@ func createConnection(address string) (conn *grpc.ClientConn, ctx context.Contex
 		log.Fatalf("did not connect: %v", err)
 	}
 
-	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
 	return conn, ctx, cancel
 }
 
@@ -153,6 +185,20 @@ func getToken() string {
 	}
 	survey.AskOne(prompt, &token, survey.WithValidator(survey.Required))
 	return token
+}
+
+func doActivate(ctx context.Context, conn *grpc.ClientConn, id int64) {
+	c := v1.NewAuthenticationServiceClient(conn)
+	req := v1.ActivateRequest{
+		Api:    apiVersion,
+		Id:     id,
+		Secret: getPassword(),
+	}
+	res, err := c.Activate(ctx, &req)
+	if err != nil {
+		log.Fatalf("Active failed: %v", err)
+	}
+	log.Printf("Active result: <%+v>\n\n", res)
 }
 
 func doLogin(ctx context.Context, conn *grpc.ClientConn, username string) {
