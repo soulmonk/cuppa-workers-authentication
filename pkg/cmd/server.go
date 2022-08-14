@@ -3,12 +3,12 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/db"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/logger"
 	"log"
 	// postgres driver
 	_ "github.com/lib/pq"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
-	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/grpc"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/rest"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/service/v1"
@@ -26,7 +26,7 @@ func RunServer() error {
 	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
 		return fmt.Errorf("failed to initialize logger: %v", err)
 	}
-	dao := pg.GetDao(cfg.PostgresqlConnectionString)
+	dao := db.GetDao(cfg.PostgresqlConnectionString)
 
 	defer func() {
 		if err := dao.Close(); err != nil {
