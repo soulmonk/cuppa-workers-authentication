@@ -3,9 +3,9 @@ package v1
 import (
 	"context"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/soulmonk/cuppa-workers-authentication/db/user"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/v1"
-	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg"
-	"github.com/soulmonk/cuppa-workers-authentication/pkg/db/pg/domain"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/db"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/logger"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
@@ -30,17 +30,17 @@ var (
 )
 
 type CustomClaims struct {
-	User *domain.User
-	jwt.StandardClaims
+	User *user.User
+	jwt.RegisteredClaims
 }
 
 // authenticationServiceServer is implementation of v1.AuthenticationServiceServer proto interface
 type authenticationServiceServer struct {
-	dao *pg.Dao
+	dao *db.Dao
 }
 
 // NewAuthenticationServiceServer creates Authentication service
-func NewAuthenticationServiceServer(dao *pg.Dao) v1.AuthenticationServiceServer {
+func NewAuthenticationServiceServer(dao *db.Dao) v1.AuthenticationServiceServer {
 	return &authenticationServiceServer{dao: dao}
 }
 
@@ -61,7 +61,7 @@ func (s *authenticationServiceServer) SignUp(ctx context.Context, req *v1.SignUp
 		return nil, err
 	}
 
-	if _, err := s.dao.UserDao.FindByName(req.Username); err == nil {
+	if _, err := s.dao.UserQuerier.FindByName(ctx, req.Username); err == nil {
 		return nil, status.Errorf(codes.AlreadyExists,
 			"user '%s' already exists", req.Username)
 	}
@@ -71,13 +71,14 @@ func (s *authenticationServiceServer) SignUp(ctx context.Context, req *v1.SignUp
 	if err != nil {
 		return nil, err
 	}
-	var user = domain.User{Name: req.Username, Email: req.Email, Password: string(hashedPass)}
-	if err := s.dao.UserDao.Create(&user); err != nil {
+	arg := user.CreateParams{Name: req.Username, Email: req.Email, Password: string(hashedPass)}
+	userCreated, err := s.dao.UserQuerier.Create(ctx, arg)
+	if err != nil {
 		return nil, err
 	}
 	return &v1.SignUpResponse{
 		Api: apiVersion,
-		Id:  user.ID,
+		Id:  userCreated.ID,
 	}, nil
 }
 
@@ -86,21 +87,21 @@ func (s *authenticationServiceServer) Login(ctx context.Context, req *v1.LoginRe
 		return nil, err
 	}
 
-	user, err := s.dao.UserDao.FindByName(req.Username)
+	u, err := s.dao.UserQuerier.FindByName(ctx, req.Username)
 	if err != nil {
 		return nil, err
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(req.Password))
 	if err != nil {
 		return nil, status.Error(codes.PermissionDenied, "")
 	}
 
 	//token := jwt.New(jwt.SigningMethodRS256)
-	claims := jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+	claims := jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 72)),
 		Issuer:    "auth.service",
-		IssuedAt:  time.Now().Unix(),
-		Subject:   strconv.FormatUint(user.ID, 10),
+		IssuedAt:  jwt.NewNumericDate(time.Now()),
+		Subject:   strconv.FormatInt(u.ID, 10),
 	}
 	// Create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -121,36 +122,36 @@ func (s *authenticationServiceServer) Validate(ctx context.Context, req *v1.Vali
 		return nil, err
 	}
 	// Parse the token
-	token, err := jwt.ParseWithClaims(req.Token, &jwt.StandardClaims{}, func(token *jwt.Token) (any, error) {
+	token, err := jwt.ParseWithClaims(req.Token, &jwt.RegisteredClaims{}, func(token *jwt.Token) (any, error) {
 		return key, nil
 	})
 
 	// Validate the token and return the custom claims
-	claims, ok := token.Claims.(*jwt.StandardClaims)
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok || !token.Valid || claims.Subject == "" {
 		return nil, err
 	}
 
-	//uid, err := strconv.ParseUint(claims.Subject, 10, 64)
-	//if err != nil {
-	//	// todo log
-	//	logger.Log.Error("ParseUint")
-	//	return nil, status.Error(codes.Internal, "")
-	//}
+	uid, err := strconv.ParseInt(claims.Subject, 10, 64)
+	if err != nil {
+		// todo log
+		logger.Log.Error("ParseUint")
+		return nil, status.Error(codes.Internal, "")
+	}
 
-	//user, err := s.dao.UserDao.FindById(strconv.FormatUint(claims.Subject, 10))
-	user, err := s.dao.UserDao.FindById(claims.Subject)
+	//u, err := s.dao.UserDao.FindById(strconv.FormatUint(claims.Subject, 10))
+	u, err := s.dao.UserQuerier.FindById(ctx, uid)
 	if err != nil {
 		logger.Log.Error("find by id")
 		return nil, status.Error(codes.Internal, "")
 	}
 
-	if !user.Enabled {
+	if !u.Enabled {
 		return nil, status.Error(codes.PermissionDenied, "")
 	}
 
 	return &v1.ValidateResponse{
 		Api: apiVersion,
-		Id:  user.ID,
+		Id:  u.ID,
 	}, nil
 }

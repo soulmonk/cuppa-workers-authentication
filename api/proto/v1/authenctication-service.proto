@@ -34,7 +34,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 
 message User {
     // Unique integer identifier of the user
-    uint64 id = 1;
+    int64 id = 1;
     // name of the user
     string username = 2;
     // email of the user
@@ -60,7 +60,7 @@ message SignUpResponse {
     string api = 1;
 
     // ID of created user
-    uint64 id = 2;
+    int64 id = 2;
 }
 
 
@@ -99,7 +99,7 @@ message ValidateResponse {
     string api = 1;
 
     // user id if valid
-    uint64 id = 2;
+    int64 id = 2;
 }
 
 // Service to manage user Authentication/Authorization
