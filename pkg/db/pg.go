@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v4"
-	_ "github.com/lib/pq"
 	"github.com/soulmonk/cuppa-workers-authentication/db/user"
 )
 
