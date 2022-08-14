@@ -39,6 +39,30 @@ type authenticationServiceServer struct {
 	dao *db.Dao
 }
 
+func (s *authenticationServiceServer) Activate(ctx context.Context, req *v1.ActivateRequest) (*v1.ActivateResponse, error) {
+	if err := s.checkAPI(req.Api); err != nil {
+		return nil, err
+	}
+
+	if req.Secret != "supper-admin-secret" {
+		return nil, status.Error(codes.PermissionDenied, "I do not know you")
+	}
+
+	u, err := s.dao.UserQuerier.FindById(ctx, req.Id)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "")
+	}
+
+	if err := s.dao.UserQuerier.Activate(ctx, u.ID); err != nil {
+		return nil, err
+	}
+
+	return &v1.ActivateResponse{
+		Api: apiVersion,
+		Id:  u.ID,
+	}, nil
+}
+
 // NewAuthenticationServiceServer creates Authentication service
 func NewAuthenticationServiceServer(dao *db.Dao) v1.AuthenticationServiceServer {
 	return &authenticationServiceServer{dao: dao}

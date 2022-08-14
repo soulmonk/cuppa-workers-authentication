@@ -1,50 +1,59 @@
 package db
 
 import (
+	"context"
 	"fmt"
-	"github.com/jmoiron/sqlx"
+	"github.com/jackc/pgx/v4"
 	_ "github.com/lib/pq"
 	"github.com/soulmonk/cuppa-workers-authentication/db/user"
 )
 
 type Dao struct {
-	db          *sqlx.DB
+	conn        *pgx.Conn
+	ctx         context.Context
 	UserQuerier user.Querier
 }
 
-func InitConnection(connectionString string) *sqlx.DB {
+func InitConnection(ctx context.Context, connectionString string) *pgx.Conn {
 	var err error
 
-	db, err := sqlx.Open("postgres", connectionString)
+	conn, err := pgx.Connect(ctx, connectionString)
 	if err != nil {
+		// todo no panic )
 		panic(err)
 	}
 
-	err = db.Ping()
+	err = conn.Ping(ctx)
 	if err != nil {
+		// todo no panic )
 		panic(err)
 	}
-	return db
+	return conn
 }
 
-func GetDao(connectionString string) *Dao {
+func GetDao(ctx context.Context, connectionString string) *Dao {
 	dao := Dao{}
-	dao.initConnection(connectionString)
+	dao.initConnection(ctx, connectionString)
+	dao.initModels()
 
 	return &dao
 }
 
 func (pg *Dao) Close() error {
-	return pg.db.Close()
+	return pg.conn.Close(pg.ctx)
 }
 
-func (pg *Dao) GetDb() *sqlx.DB {
-	return pg.db
+func (pg *Dao) GetDb() *pgx.Conn {
+	return pg.conn
 }
 
-func (pg *Dao) initConnection(connectionString string) {
-	pg.db = InitConnection(connectionString)
+func (pg *Dao) initConnection(ctx context.Context, connectionString string) {
+	pg.ctx = ctx
+	pg.conn = InitConnection(ctx, connectionString)
 
-	pg.UserQuerier = user.New(pg.db)
 	fmt.Println("Successfully connected!")
+}
+
+func (pg *Dao) initModels() {
+	pg.UserQuerier = user.New(pg.conn)
 }

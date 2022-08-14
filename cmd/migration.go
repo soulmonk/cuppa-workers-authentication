@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/soulmonk/cuppa-workers-authentication/db/migration"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/config"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/db"
@@ -12,10 +13,11 @@ func main() {
 	log.Println("Starting migration")
 	cfg := config.Load()
 
-	connection := db.InitConnection(cfg.PostgresqlConnectionString)
+	ctx := context.Background()
+	connection := db.InitConnection(ctx, cfg.PostgresqlConnectionString)
 
 	defer func() {
-		if err := connection.Close(); err != nil {
+		if err := connection.Close(ctx); err != nil {
 			log.Fatal(err)
 		}
 	}()

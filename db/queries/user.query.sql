@@ -12,5 +12,8 @@ SELECT * FROM "user" where id = $1;
 -- name: FindByName :one
 SELECT * FROM "user" where name = $1;
 
--- name: DeleteUser :exec
+-- name: Delete :exec
 UPDATE "user" SET enabled=False WHERE id = $1;
+
+-- name: Activate :exec
+UPDATE "user" SET enabled=True WHERE id = $1;

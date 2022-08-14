@@ -1,7 +1,8 @@
 package migration
 
 import (
-	"github.com/jmoiron/sqlx"
+	"context"
+	"github.com/jackc/pgx/v4"
 	"io/ioutil"
 	"log"
 	"os"
@@ -22,21 +23,21 @@ func (p migrationFiles) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 // Sort is a convenience method.
 func (p migrationFiles) Sort() { sort.Sort(p) }
 
-func Proceed(db *sqlx.DB) error {
+func Proceed(conn *pgx.Conn) error {
 	var err error
 	var count uint64
-	if count, err = initTable(db); err != nil {
+	if count, err = initTable(conn); err != nil {
 		return err
 	}
 
 	log.Println("Existing migration count: ", count)
 
 	var storedMigrations []string
-	if storedMigrations, err = loadMigration(db, count); err != nil {
+	if storedMigrations, err = loadMigration(conn, count); err != nil {
 		return err
 	}
 
-	log.Println("Loaded migrations from db", storedMigrations)
+	log.Println("Loaded migrations from conn", storedMigrations)
 
 	migrationData, err := getMigrationList(sort.StringSlice(storedMigrations))
 	if err != nil {
@@ -50,20 +51,21 @@ func Proceed(db *sqlx.DB) error {
 
 	log.Println("Exists new migrations", len(migrationData))
 
-	return applyMigration(db, migrationData)
+	return applyMigration(conn, migrationData)
 }
 
-func applyMigration(db *sqlx.DB, files migrationFiles) (err error) {
+func applyMigration(conn *pgx.Conn, files migrationFiles) (err error) {
+	ctx := context.Background()
 	for _, file := range files {
 		log.Println("Start process data: ", file.name)
 		var query = string(file.data)
 		log.Println("Run query:\n", query)
-		if _, err = db.Exec(query); err != nil {
+		if _, err = conn.Exec(ctx, query); err != nil {
 			log.Println("Error applying migration", err.Error())
 			return
 		}
 
-		if err = create(db, file.name); err != nil {
+		if err = create(conn, file.name); err != nil {
 			return
 		}
 	}
@@ -71,11 +73,12 @@ func applyMigration(db *sqlx.DB, files migrationFiles) (err error) {
 	return
 }
 
-func create(db *sqlx.DB, name string) error {
+func create(conn *pgx.Conn, name string) error {
 	query := `INSERT INTO migrations (name, created_at) VALUES ($1, now()) RETURNING id`
+	ctx := context.Background()
 	var id uint64
-	err := db.
-		QueryRow(query, name).
+	err := conn.
+		QueryRow(ctx, query, name).
 		Scan(&id)
 
 	if err != nil {
@@ -87,25 +90,23 @@ func create(db *sqlx.DB, name string) error {
 	return nil
 }
 
-func loadMigration(db *sqlx.DB, count uint64) (migrations []string, err error) {
+func loadMigration(conn *pgx.Conn, count uint64) (migrations []string, err error) {
 	migrations = make([]string, count)
 
 	if count == 0 {
 		return
 	}
 
-	rows, err := db.Queryx(`SELECT name FROM migrations`)
+	ctx := context.Background()
+
+	rows, err := conn.Query(ctx, `SELECT name FROM migrations`)
 
 	if err != nil {
 		log.Println("Error on executing query")
 		return nil, err
 	}
 
-	defer func() {
-		if err := rows.Close(); err != nil {
-			log.Println("Error corrupted while closing rows:", err.Error())
-		}
-	}()
+	defer rows.Close()
 
 	var name string
 	for rows.Next() {
@@ -123,11 +124,12 @@ func loadMigration(db *sqlx.DB, count uint64) (migrations []string, err error) {
 	return migrations, err
 }
 
-func initTable(db *sqlx.DB) (uint64, error) {
+func initTable(conn *pgx.Conn) (uint64, error) {
 
+	ctx := context.Background()
 	query := `SELECT COUNT(1) FROM migrations;`
 	var count uint64
-	err := db.QueryRow(query).Scan(&count)
+	err := conn.QueryRow(ctx, query).Scan(&count)
 
 	if err != nil {
 		// todo check error table dose not exists
@@ -143,7 +145,7 @@ func initTable(db *sqlx.DB) (uint64, error) {
   created_at timestamp default now()
 );
 `
-		if _, err := db.Exec(query); err != nil {
+		if _, err := conn.Exec(ctx, query); err != nil {
 			log.Println("Error initTable", err.Error())
 			return count, err
 		}

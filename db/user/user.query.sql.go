@@ -10,6 +10,15 @@ import (
 	"time"
 )
 
+const activate = `-- name: Activate :exec
+UPDATE "user" SET enabled=True WHERE id = $1
+`
+
+func (q *Queries) Activate(ctx context.Context, id int64) error {
+	_, err := q.db.Exec(ctx, activate, id)
+	return err
+}
+
 const create = `-- name: Create :one
 INSERT INTO "user" (name, email, password, enabled, created_at, updated_at)
 VALUES ($1, $2, $3, false, now(), now())
@@ -30,7 +39,7 @@ type CreateRow struct {
 }
 
 func (q *Queries) Create(ctx context.Context, arg CreateParams) (CreateRow, error) {
-	row := q.queryRow(ctx, q.createStmt, create, arg.Name, arg.Email, arg.Password)
+	row := q.db.QueryRow(ctx, create, arg.Name, arg.Email, arg.Password)
 	var i CreateRow
 	err := row.Scan(
 		&i.ID,
@@ -41,12 +50,12 @@ func (q *Queries) Create(ctx context.Context, arg CreateParams) (CreateRow, erro
 	return i, err
 }
 
-const deleteUser = `-- name: DeleteUser :exec
+const delete = `-- name: Delete :exec
 UPDATE "user" SET enabled=False WHERE id = $1
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
-	_, err := q.exec(ctx, q.deleteUserStmt, deleteUser, id)
+func (q *Queries) Delete(ctx context.Context, id int64) error {
+	_, err := q.db.Exec(ctx, delete, id)
 	return err
 }
 
@@ -55,7 +64,7 @@ SELECT id, name, email, password, enabled, created_at, updated_at, refresh_token
 `
 
 func (q *Queries) FindById(ctx context.Context, id int64) (User, error) {
-	row := q.queryRow(ctx, q.findByIdStmt, findById, id)
+	row := q.db.QueryRow(ctx, findById, id)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -75,7 +84,7 @@ SELECT id, name, email, password, enabled, created_at, updated_at, refresh_token
 `
 
 func (q *Queries) FindByName(ctx context.Context, name string) (User, error) {
-	row := q.queryRow(ctx, q.findByNameStmt, findByName, name)
+	row := q.db.QueryRow(ctx, findByName, name)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -104,7 +113,7 @@ type ListRow struct {
 }
 
 func (q *Queries) List(ctx context.Context) ([]ListRow, error) {
-	rows, err := q.query(ctx, q.listStmt, list)
+	rows, err := q.db.Query(ctx, list)
 	if err != nil {
 		return nil, err
 	}
@@ -123,9 +132,6 @@ func (q *Queries) List(ctx context.Context) ([]ListRow, error) {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

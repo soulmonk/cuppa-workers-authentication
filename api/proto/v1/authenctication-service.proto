@@ -102,6 +102,26 @@ message ValidateResponse {
     int64 id = 2;
 }
 
+// Request that contains data for user activation
+message ActivateRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // secret
+  string secret = 2;
+
+  // user id if valid
+  int64 id = 3;
+}
+// Response that contains data for activated user
+message ActivateResponse {
+    // API versioning: it is my best practice to specify version explicitly
+    string api = 1;
+
+    // user id if valid
+    int64 id = 2;
+}
+
 // Service to manage user Authentication/Authorization
 service AuthenticationService {
 
@@ -113,4 +133,7 @@ service AuthenticationService {
 
     // Validate user
     rpc Validate (ValidateRequest) returns (ValidateResponse) {}
+
+    // Activate User
+    rpc Activate (ActivateRequest) returns (ActivateResponse) {}
 }
