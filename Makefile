@@ -19,6 +19,9 @@ WHITE  := $(shell tput -Txterm setaf 7)
 CYAN   := $(shell tput -Txterm setaf 6)
 RESET  := $(shell tput -Txterm sgr0)
 
+# GO_PATH := ~/go
+# PATH := $PATH:/$GO_PATH/bin
+
 ## Install:
 install: init go-mod-init ## run "init" "go-mod-init"
 
@@ -58,12 +61,14 @@ clean-proto:
 
 gen-proto: ## Generate proto
 	@echo "  >  Generate proto"
+	@echo "${YELLOW}Hint${RESET}: in some cases require export path"
+	@echo "export GO_PATH := ~/go"
+	@echo "export PATH := $PATH:/$GO_PATH/bin"
 	@$(shell $(PROJ_BASE)/third_party/protoc-gen.sh)
 
 
 gen-db: ## Generate go from sql
 	@sqlc generate
-
 
 
 build-all: ## Runs `gen-proto` `build-server` `c`

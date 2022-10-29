@@ -8,6 +8,8 @@ package user
 import (
 	"context"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const activate = `-- name: Activate :exec
@@ -19,9 +21,23 @@ func (q *Queries) Activate(ctx context.Context, id int64) error {
 	return err
 }
 
+const clearUserToken = `-- name: ClearUserToken :exec
+DELETE FROM "refresh_token" where user_id = $1 and source = $2
+`
+
+type ClearUserTokenParams struct {
+	UserID int64  `json:"user_id"`
+	Source string `json:"source"`
+}
+
+func (q *Queries) ClearUserToken(ctx context.Context, arg ClearUserTokenParams) error {
+	_, err := q.db.Exec(ctx, clearUserToken, arg.UserID, arg.Source)
+	return err
+}
+
 const create = `-- name: Create :one
-INSERT INTO "user" (name, email, password, enabled, created_at, updated_at)
-VALUES ($1, $2, $3, false, now(), now())
+INSERT INTO "user" (name, email, password, enabled, role, created_at, updated_at)
+VALUES ($1, $2, $3, false, role, now(), now())
 RETURNING id, enabled, created_at, updated_at
 `
 
@@ -60,7 +76,7 @@ func (q *Queries) Delete(ctx context.Context, id int64) error {
 }
 
 const findById = `-- name: FindById :one
-SELECT id, name, email, password, enabled, created_at, updated_at, refresh_token FROM "user" where id = $1
+SELECT id, name, email, password, enabled, created_at, updated_at, role FROM "user" where id = $1
 `
 
 func (q *Queries) FindById(ctx context.Context, id int64) (User, error) {
@@ -74,13 +90,13 @@ func (q *Queries) FindById(ctx context.Context, id int64) (User, error) {
 		&i.Enabled,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.RefreshToken,
+		&i.Role,
 	)
 	return i, err
 }
 
 const findByName = `-- name: FindByName :one
-SELECT id, name, email, password, enabled, created_at, updated_at, refresh_token FROM "user" where name = $1
+SELECT id, name, email, password, enabled, created_at, updated_at, role FROM "user" where name = $1
 `
 
 func (q *Queries) FindByName(ctx context.Context, name string) (User, error) {
@@ -94,9 +110,20 @@ func (q *Queries) FindByName(ctx context.Context, name string) (User, error) {
 		&i.Enabled,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.RefreshToken,
+		&i.Role,
 	)
 	return i, err
+}
+
+const findRefreshToken = `-- name: FindRefreshToken :one
+SELECT user_id FROM "refresh_token" where token = $1
+`
+
+func (q *Queries) FindRefreshToken(ctx context.Context, token uuid.UUID) (int64, error) {
+	row := q.db.QueryRow(ctx, findRefreshToken, token)
+	var user_id int64
+	err := row.Scan(&user_id)
+	return user_id, err
 }
 
 const list = `-- name: List :many

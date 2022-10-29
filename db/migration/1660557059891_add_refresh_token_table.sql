@@ -1,7 +1,7 @@
 alter table "user"
   drop column refresh_token;
 
-drop table "user_userverification";
+drop table "user_verification";
 
 create table "refresh_token"
 (

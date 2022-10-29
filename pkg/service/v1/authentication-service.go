@@ -39,6 +39,29 @@ type authenticationServiceServer struct {
 	dao *db.Dao
 }
 
+func (s *authenticationServiceServer) Logout(ctx context.Context, req *v1.LogoutRequest) (*v1.LogoutResponse, error) {
+  //TODO implement me
+  panic("implement me")
+}
+
+func (s *authenticationServiceServer) RefreshToken(ctx context.Context, req *v1.RefreshTokenRequest) (*v1.RefreshTokenResponse, error) {
+  if err := s.checkAPI(req.Api); err != nil {
+    return nil, err
+  }
+
+  // - find RefreshToken
+  // - remove it (unsave bacause if something goes wrong user need to login again)
+  //   - maybe invalidate, set active to false
+  // - generate new one
+  // - generate new token
+
+  return &v1.RefreshTokenResponse{
+    Api: apiVersion,
+    Token:  "new token",
+    RefreshToken:  "new refresh token",
+    }, nil
+}
+
 func (s *authenticationServiceServer) Activate(ctx context.Context, req *v1.ActivateRequest) (*v1.ActivateResponse, error) {
 	if err := s.checkAPI(req.Api); err != nil {
 		return nil, err
@@ -48,7 +71,7 @@ func (s *authenticationServiceServer) Activate(ctx context.Context, req *v1.Acti
 		return nil, status.Error(codes.PermissionDenied, "I do not know you")
 	}
 
-	u, err := s.dao.UserQuerier.FindById(ctx, req.Id)
+    u, err := s.dao.UserQuerier.FindById(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "")
 	}
@@ -177,5 +200,6 @@ func (s *authenticationServiceServer) Validate(ctx context.Context, req *v1.Vali
 	return &v1.ValidateResponse{
 		Api: apiVersion,
 		Id:  u.ID,
+		Role:  u.Role,
 	}, nil
 }

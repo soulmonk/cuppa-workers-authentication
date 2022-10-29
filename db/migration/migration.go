@@ -158,7 +158,7 @@ func getMigrationList(storedMigrations sort.StringSlice) (result migrationFiles,
 	var files []os.FileInfo
 
 	// from cwd => pkg/db/pg/migration
-	const mathToMigrations = "./pkg/db/pg/migration/"
+	const mathToMigrations = "./db/migration/"
 	if files, err = ioutil.ReadDir(mathToMigrations); err != nil {
 		return nil, err
 	}

@@ -10,13 +10,21 @@ import (
 	"github.com/google/uuid"
 )
 
+type RefreshToken struct {
+	ID        int64     `json:"id"`
+	UserID    int64     `json:"user_id"`
+	CreatedAt time.Time `json:"created_at"`
+	Source    string    `json:"source"`
+	Token     uuid.UUID `json:"token"`
+}
+
 type User struct {
-	ID           int64         `json:"id"`
-	Name         string        `json:"name"`
-	Email        string        `json:"email"`
-	Password     string        `json:"password"`
-	Enabled      bool          `json:"enabled"`
-	CreatedAt    time.Time     `json:"created_at"`
-	UpdatedAt    time.Time     `json:"updated_at"`
-	RefreshToken uuid.NullUUID `json:"refresh_token"`
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	Password  string    `json:"password"`
+	Enabled   bool      `json:"enabled"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Role      string    `json:"role"`
 }
