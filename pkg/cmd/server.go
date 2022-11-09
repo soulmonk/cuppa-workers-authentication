@@ -8,7 +8,6 @@ import (
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/logger"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/grpc"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/rest"
-	"github.com/soulmonk/cuppa-workers-authentication/pkg/service/v1"
 	"log"
 )
 
@@ -32,13 +31,11 @@ func RunServer() error {
 		}
 	}()
 
-	v1API := v1.NewAuthenticationServiceServer(dao)
-
 	// todo rest temporary not needed
 	// run HTTP gateway
 	go func() {
 		_ = rest.RunServer(ctx, cfg.HTTPPort)
 	}()
 
-	return grpc.RunServer(ctx, v1API, cfg.GRPCPort)
+	return grpc.RunServer(ctx, dao, cfg.GRPCPort)
 }

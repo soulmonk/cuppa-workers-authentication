@@ -1,0 +1,197 @@
+syntax = "proto3";
+
+package authentication_v1;
+
+option go_package = "github.com/soulmonk/cuppa-workers-authentication;authentication_v1";
+
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    title: "cuppa/cuppa-workers: Authentication protocol"
+    version: "1.0"
+    contact: {
+      name: "cuppa/cuppa-workers/authentication project"
+      url: "https://github.com/soulmonk/cuppa-workers-authentication"
+      email: "fsoulmonk@gmail.com"
+    }
+  }
+  schemes: HTTP
+  consumes: "application/json"
+  produces: "application/json"
+  responses: {
+    key: "404"
+    value: {
+      description: "Returned when the resource does not exist."
+      schema: {
+        json_schema: {
+          type: STRING
+        }
+      }
+    }
+  }
+};
+
+message User {
+  // Unique integer identifier of the user
+  int64 id = 1;
+  // name of the user
+  string username = 2;
+  // email of the user
+  string email = 3;
+}
+
+// Request data to create new user
+message SignUpRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // name of the user
+  string username = 2;
+  // email of the user
+  string email = 3;
+  // password of the user
+  string password = 4;
+}
+
+// Response that contains data for created user
+message SignUpResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // ID of created user
+  int64 id = 2;
+}
+
+
+// request data for login
+message LoginRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // name of the user
+  string username = 2;
+  // password of the user
+  string password = 3;
+}
+
+// Response that contains data for login
+message LoginResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // authentication token
+  string token = 2;
+  // authentication refresh token
+  string refreshToken = 3;
+}
+
+// Request that contains data for refresh token
+message LogoutRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // authentication token
+  string token = 2;
+
+  // todo optional not supported in swager generator https://github.com/wechaty/grpc/issues/109
+  // inditacte to logge
+  bool all = 3;
+
+  // in plance, implit refresh tokens per apps
+  string source = 4;
+}
+
+// Response that contains data for logged out
+message LogoutResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // status
+  bool status = 2;
+}
+
+// Request that contains data for login
+message ValidateRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // authentication token
+  string token = 2;
+}
+
+// Response that contains data for login
+message ValidateResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // user id if valid
+  int64 id = 2;
+
+  // user role if valid
+  string role = 3;
+}
+
+// Request that contains data for refresh token
+message RefreshTokenRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // refreshToken token
+  string refreshToken = 2;
+}
+
+// Response that contains data for refreshed token
+message RefreshTokenResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // authentication token
+  string token = 2;
+
+  // authentication refresh token
+  string refreshToken = 3;
+}
+
+// [Admin] Request that contains data for user activation
+message ActivateRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // secret
+  string secret = 2;
+
+  // user id if valid
+  int64 id = 3;
+}
+
+// [Admin] Response that contains data for activated user
+message ActivateResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // user id if valid
+  int64 id = 2;
+}
+
+// Service to manage user Authentication/Authorization
+service AuthenticationService {
+
+  // SignUp user
+  rpc SignUp (SignUpRequest) returns (SignUpResponse) {}
+
+  // Login user
+  rpc Login (LoginRequest) returns (LoginResponse) {}
+
+  // Logout user
+  rpc Logout (LogoutRequest) returns (LogoutResponse) {}
+
+  // Refresh user token
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse) {}
+
+  // Validate user
+  rpc Validate (ValidateRequest) returns (ValidateResponse) {}
+
+  // Activate User
+  rpc Activate (ActivateRequest) returns (ActivateResponse) {}
+}

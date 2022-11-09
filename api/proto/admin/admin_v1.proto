@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package admin_v1;
+
+option go_package = "github.com/soulmonk/cuppa-workers-authentication;admin_v1";
+
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+  info: {
+    title: "cuppa/cuppa-workers: Authentication protocol"
+    version: "1.0"
+    contact: {
+      name: "cuppa/cuppa-workers/authentication project"
+      url: "https://github.com/soulmonk/cuppa-workers-authentication"
+      email: "fsoulmonk@gmail.com"
+    }
+  }
+  schemes: HTTP
+  consumes: "application/json"
+  produces: "application/json"
+  responses: {
+    key: "404"
+    value: {
+      description: "Returned when the resource does not exist."
+      schema: {
+        json_schema: {
+          type: STRING
+        }
+      }
+    }
+  }
+};
+
+// [Admin] Request that contains data for user activation
+message ActivateRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // secret
+  string secret = 2;
+
+  // user id if valid
+  int64 id = 3;
+}
+
+// [Admin] Response that contains data for activated user
+message ActivateResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // user id if valid
+  int64 id = 2;
+}
+
+message ResetPasswordRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // secret
+  string secret = 2;
+
+  // user id if valid
+  int64 id = 3;
+
+  // new password
+  string password = 4;
+}
+
+message ResetPasswordResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // user id if valid
+  int64 id = 2;
+}
+
+// Admin service to manage user
+service AdminService {
+
+  // [Admin] Reset user password
+  rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse) {}
+
+  // Activate User
+  rpc Activate (ActivateRequest) returns (ActivateResponse) {}
+}
