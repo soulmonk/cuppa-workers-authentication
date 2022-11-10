@@ -31,6 +31,7 @@ func RunServer(ctx context.Context, dao *db.Dao, port string) error {
 
 	// register service
 	server := grpc.NewServer(opts...)
+	//Register reflection service on gRPC server. to allow use describe command
 	reflection.Register(server)
 	authenticationV1API := authentication_service_v1.NewAuthenticationServiceServer(dao)
 	authentication_v1.RegisterAuthenticationServiceServer(server, authenticationV1API)
