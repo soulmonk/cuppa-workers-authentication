@@ -121,9 +121,11 @@ install-swagger-docker: ## install swagger-docker
 	@echo "  > Installing swagger docker"
 	@docker pull swaggerapi/swagger-ui
 
+## [[depricated]]
 create-swagger-docker: ## create docker container "authentication-swagger-ui"
-	@docker create --name authentication-swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/authentication/authentication_v1.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
+	@docker create --name authentication-swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
 
+## [[depricated]]
 run-swagger-docker: ## running swagger docker
 	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
 	@docker run --rm -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/authentication/openapi.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
