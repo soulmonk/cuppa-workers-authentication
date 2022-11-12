@@ -23,7 +23,7 @@ func RunServer(ctx context.Context, dao *db.Dao, port string) error {
 		return err
 	}
 
-	// gRPC server statup options
+	// gRPC server startup options
 	var opts []grpc.ServerOption
 
 	// add middleware
