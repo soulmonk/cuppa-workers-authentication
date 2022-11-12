@@ -16,8 +16,8 @@ import (
 	"os/signal"
 )
 
-// RunServer runs HTTP/REST gateway
-func RunServer(ctx context.Context, dao *db.Dao, port string) error {
+// RunServer runs grpc server
+func RunServer(ctx context.Context, dao *db.Dao, port string, exposeReflection bool) error {
 	listen, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
@@ -31,8 +31,11 @@ func RunServer(ctx context.Context, dao *db.Dao, port string) error {
 
 	// register service
 	server := grpc.NewServer(opts...)
-	//Register reflection service on gRPC server. to allow use describe command
-	reflection.Register(server)
+	if exposeReflection {
+		//Register reflection service on gRPC server. to allow use describe command
+		reflection.Register(server)
+	}
+
 	authenticationAPI := authenticationService.NewAuthenticationServiceServer(dao)
 	authentication.RegisterAuthenticationServiceServer(server, authenticationAPI)
 	adminAPI := adminService.NewAuthenticationServiceServer(dao)

@@ -37,5 +37,5 @@ func RunServer() error {
 		_ = rest.RunServer(ctx, cfg.HTTPPort)
 	}()
 
-	return grpc.RunServer(ctx, dao, cfg.GRPCPort)
+	return grpc.RunServer(ctx, dao, cfg.GRPCPort, cfg.GRPCExposeReflection)
 }
