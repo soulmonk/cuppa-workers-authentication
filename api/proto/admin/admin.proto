@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package admin;
+
+option go_package = "github.com/soulmonk/cuppa-workers-authentication;admin";
+
+// [Admin] Request that contains data for user activation
+message ActivateRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // secret
+  string secret = 2;
+
+  // user id if valid
+  int64 id = 3;
+}
+
+// [Admin] Response that contains data for activated user
+message ActivateResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // user id if valid
+  int64 id = 2;
+}
+
+message ResetPasswordRequest {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // secret
+  string secret = 2;
+
+  // user id if valid
+  int64 id = 3;
+
+  // new password
+  string password = 4;
+}
+
+message ResetPasswordResponse {
+  // API versioning: it is my best practice to specify version explicitly
+  string api = 1;
+
+  // user id if valid
+  int64 id = 2;
+}
+
+// Admin service to manage user
+service AdminService {
+
+  // [Admin] Reset user password
+  rpc ResetPassword (ResetPasswordRequest) returns (ResetPasswordResponse) {}
+
+  // Activate User
+  rpc Activate (ActivateRequest) returns (ActivateResponse) {}
+}

@@ -10,7 +10,8 @@ import (
 type Config struct {
 	// gRPC server start parameters section
 	// gRPC is TCP port to listen by gRPC server
-	GRPCPort string
+	GRPCPort             string
+	GRPCExposeReflection bool
 
 	// HTTP/REST gateway start parameters section
 	// HTTPPort is TCP port to listen by HTTP/REST gateway
@@ -36,6 +37,7 @@ func Load() *Config {
 	logLevel, _ := strconv.Atoi(getEnv("LOG_LEVEL", "-1"))
 	config = Config{
 		GRPCPort:                   getEnv("GRPC_PORT", "9090"),
+		GRPCExposeReflection:       getBoolEnv("GRPC_EXPOSE_REFLECTION", false),
 		HTTPPort:                   getEnv("HTTP_PORT", "51101"),
 		LogLevel:                   logLevel,
 		LogTimeFormat:              getEnv("LOG_TIME_FORMAT", "2006-01-02T15:04:05.999999999Z07:00"),
@@ -51,6 +53,14 @@ func getEnv(key string, def string) string {
 		return def
 	}
 	return v
+}
+
+func getBoolEnv(key string, def bool) bool {
+	v := os.Getenv(key)
+	if v == "" {
+		return def
+	}
+	return v == "true"
 }
 
 func Get() *Config {

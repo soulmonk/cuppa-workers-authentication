@@ -2,23 +2,28 @@ package grpc
 
 import (
 	"context"
-	v1 "github.com/soulmonk/cuppa-workers-authentication/pkg/api/v1"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/admin"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/authentication"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/db"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/logger"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/grpc/middleware"
+	adminService "github.com/soulmonk/cuppa-workers-authentication/pkg/service/admin"
+	authenticationService "github.com/soulmonk/cuppa-workers-authentication/pkg/service/authentication"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"net"
 	"os"
 	"os/signal"
 )
 
-// RunServer runs HTTP/REST gateway
-func RunServer(ctx context.Context, v1API v1.AuthenticationServiceServer, port string) error {
+// RunServer runs grpc server
+func RunServer(ctx context.Context, dao *db.Dao, port string, exposeReflection bool) error {
 	listen, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return err
 	}
 
-	// gRPC server statup options
+	// gRPC server startup options
 	var opts []grpc.ServerOption
 
 	// add middleware
@@ -26,7 +31,15 @@ func RunServer(ctx context.Context, v1API v1.AuthenticationServiceServer, port s
 
 	// register service
 	server := grpc.NewServer(opts...)
-	v1.RegisterAuthenticationServiceServer(server, v1API)
+	if exposeReflection {
+		//Register reflection service on gRPC server. to allow use describe command
+		reflection.Register(server)
+	}
+
+	authenticationAPI := authenticationService.NewAuthenticationServiceServer(dao)
+	authentication.RegisterAuthenticationServiceServer(server, authenticationAPI)
+	adminAPI := adminService.NewAuthenticationServiceServer(dao)
+	admin.RegisterAdminServiceServer(server, adminAPI)
 
 	// graceful shutdown
 	c := make(chan os.Signal, 1)
