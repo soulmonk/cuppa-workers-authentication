@@ -6,14 +6,18 @@ package user
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	Activate(ctx context.Context, id int64) error
+	ClearUserToken(ctx context.Context, arg ClearUserTokenParams) error
 	Create(ctx context.Context, arg CreateParams) (CreateRow, error)
 	Delete(ctx context.Context, id int64) error
 	FindById(ctx context.Context, id int64) (User, error)
 	FindByName(ctx context.Context, name string) (User, error)
+	FindRefreshToken(ctx context.Context, token uuid.UUID) (int64, error)
 	List(ctx context.Context) ([]ListRow, error)
 }
 

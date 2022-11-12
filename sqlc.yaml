@@ -4,7 +4,11 @@ packages:
     name: "user"
     engine: "postgresql"
     sql_package: "pgx/v4"
-    schema: "./db/schemas/user.schema.sql"
+    schema:
+      - "./db/migration/1571546291912_init.sql"
+      - "./db/migration/1582635447898_add_refresh-token_to_user.sql"
+      - "./db/migration/1660557059891_add_refresh_token_table.sql"
+      - "./db/migration/1667042268790_add_role_column_to_user.sql"
     queries: "./db/queries/user.query.sql"
     emit_json_tags: true
     emit_prepared_queries: true
