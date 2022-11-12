@@ -1,36 +1,8 @@
 syntax = "proto3";
 
-package authentication_v1;
+package authentication;
 
-option go_package = "github.com/soulmonk/cuppa-workers-authentication;authentication_v1";
-
-import "protoc-gen-swagger/options/annotations.proto";
-
-option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
-  info: {
-    title: "cuppa/cuppa-workers: Authentication protocol"
-    version: "1.0"
-    contact: {
-      name: "cuppa/cuppa-workers/authentication project"
-      url: "https://github.com/soulmonk/cuppa-workers-authentication"
-      email: "fsoulmonk@gmail.com"
-    }
-  }
-  schemes: HTTP
-  consumes: "application/json"
-  produces: "application/json"
-  responses: {
-    key: "404"
-    value: {
-      description: "Returned when the resource does not exist."
-      schema: {
-        json_schema: {
-          type: STRING
-        }
-      }
-    }
-  }
-};
+option go_package = "github.com/soulmonk/cuppa-workers-authentication;authentication";
 
 message User {
   // Unique integer identifier of the user
@@ -95,10 +67,10 @@ message LogoutRequest {
   string token = 2;
 
   // todo optional not supported in swager generator https://github.com/wechaty/grpc/issues/109
-  // inditacte to logge
+  // indicate to logout on all devices
   bool all = 3;
 
-  // in plance, implit refresh tokens per apps
+  // in plane, implicit refresh tokens per apps
   string source = 4;
 }
 
@@ -153,30 +125,30 @@ message RefreshTokenResponse {
   string refreshToken = 3;
 }
 
-// [Admin] Request that contains data for user activation
-message ActivateRequest {
+message ChangePasswordRequest {
   // API versioning: it is my best practice to specify version explicitly
   string api = 1;
 
-  // secret
-  string secret = 2;
+  // authentication token
+  string token = 2;
 
-  // user id if valid
-  int64 id = 3;
+  // old password
+  string oldPassword = 3;
+
+  // new password
+  string newPassword = 4;
 }
 
-// [Admin] Response that contains data for activated user
-message ActivateResponse {
+message ChangePasswordResponse {
   // API versioning: it is my best practice to specify version explicitly
   string api = 1;
 
-  // user id if valid
-  int64 id = 2;
+  // status
+  bool status = 2;
 }
 
 // Service to manage user Authentication/Authorization
 service AuthenticationService {
-
   // SignUp user
   rpc SignUp (SignUpRequest) returns (SignUpResponse) {}
 
@@ -192,6 +164,6 @@ service AuthenticationService {
   // Validate user
   rpc Validate (ValidateRequest) returns (ValidateResponse) {}
 
-  // Activate User
-  rpc Activate (ActivateRequest) returns (ActivateResponse) {}
+  // Validate user
+  rpc ChangePassword (ChangePasswordRequest) returns (ChangePasswordResponse) {}
 }

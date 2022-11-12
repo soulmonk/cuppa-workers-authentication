@@ -55,15 +55,14 @@ clean-build:
 
 clean-proto:
 	@echo "  >  Clean proto"
-	@-rm -f $(PROJ_BASE)/api/swagger/**/*.json 2> /dev/null
-	@-rm -f $(PROJ_BASE)/pkg/api/v1/*.pb.* 2> /dev/null
+	@-rm -f $(PROJ_BASE)/pkg/api/**/*.pb.* 2> /dev/null
 	@echo
 
 gen-proto: ## Generate proto
 	@echo "  >  Generate proto"
 	@echo "${YELLOW}Hint${RESET}: in some cases require export path"
 	@echo "export GO_PATH := ~/go"
-	@echo "export PATH := $PATH:/$GO_PATH/bin"
+	@echo 'export PATH := $$PATH:$$GO_PATH/bin'
 	@$(shell $(PROJ_BASE)/third_party/protoc-gen.sh)
 
 
@@ -123,11 +122,11 @@ install-swagger-docker: ## install swagger-docker
 	@docker pull swaggerapi/swagger-ui
 
 create-swagger-docker: ## create docker container "authentication-swagger-ui"
-	@docker create --name authentication-swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
+	@docker create --name authentication-swagger-ui -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/authentication/authentication_v1.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
 
 run-swagger-docker: ## running swagger docker
 	@echo "  >  Starting swagger docker http://127.0.0.1:9000"
-	@docker run -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/v1/authenctication-service.swagger.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
+	@docker run --rm -p 9000:8080 -e SWAGGER_JSON=/app/api/swagger/authentication/openapi.json -v ${PROJ_BASE}:/app swaggerapi/swagger-ui
 
 start-swagger-docker: ## starting swagger docker
 	@echo "  >  Starting swagger docker http://127.0.0.1:9000"

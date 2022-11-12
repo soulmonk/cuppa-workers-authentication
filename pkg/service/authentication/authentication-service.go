@@ -1,4 +1,4 @@
-package authentication_v1
+package authentication
 
 import (
 	"context"
@@ -34,17 +34,22 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-// authenticationServiceServer is implementation of authentication_v1.AuthenticationServiceServer proto interface
+// authenticationServiceServer is implementation of authentication.AuthenticationServiceServer proto interface
 type authenticationServiceServer struct {
 	dao *db.Dao
 }
 
-func (s *authenticationServiceServer) Logout(ctx context.Context, req *authentication_v1.LogoutRequest) (*authentication_v1.LogoutResponse, error) {
+func (s *authenticationServiceServer) ChangePassword(ctx context.Context, req *authentication.ChangePasswordRequest) (*authentication.ChangePasswordResponse, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *authenticationServiceServer) RefreshToken(ctx context.Context, req *authentication_v1.RefreshTokenRequest) (*authentication_v1.RefreshTokenResponse, error) {
+func (s *authenticationServiceServer) Logout(ctx context.Context, req *authentication.LogoutRequest) (*authentication.LogoutResponse, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *authenticationServiceServer) RefreshToken(ctx context.Context, req *authentication.RefreshTokenRequest) (*authentication.RefreshTokenResponse, error) {
 	if err := s.checkAPI(req.Api); err != nil {
 		return nil, err
 	}
@@ -55,39 +60,15 @@ func (s *authenticationServiceServer) RefreshToken(ctx context.Context, req *aut
 	// - generate new one
 	// - generate new token
 
-	return &authentication_v1.RefreshTokenResponse{
+	return &authentication.RefreshTokenResponse{
 		Api:          apiVersion,
 		Token:        "new token",
 		RefreshToken: "new refresh token",
 	}, nil
 }
 
-func (s *authenticationServiceServer) Activate(ctx context.Context, req *authentication_v1.ActivateRequest) (*authentication_v1.ActivateResponse, error) {
-	if err := s.checkAPI(req.Api); err != nil {
-		return nil, err
-	}
-
-	if req.Secret != "supper-admin-secret" {
-		return nil, status.Error(codes.PermissionDenied, "I do not know you")
-	}
-
-	u, err := s.dao.UserQuerier.FindById(ctx, req.Id)
-	if err != nil {
-		return nil, status.Error(codes.NotFound, "")
-	}
-
-	if err := s.dao.UserQuerier.Activate(ctx, u.ID); err != nil {
-		return nil, err
-	}
-
-	return &authentication_v1.ActivateResponse{
-		Api: apiVersion,
-		Id:  u.ID,
-	}, nil
-}
-
 // NewAuthenticationServiceServer creates Authentication service
-func NewAuthenticationServiceServer(dao *db.Dao) authentication_v1.AuthenticationServiceServer {
+func NewAuthenticationServiceServer(dao *db.Dao) authentication.AuthenticationServiceServer {
 	return &authenticationServiceServer{dao: dao}
 }
 
@@ -103,7 +84,7 @@ func (s *authenticationServiceServer) checkAPI(api string) error {
 	return nil
 }
 
-func (s *authenticationServiceServer) SignUp(ctx context.Context, req *authentication_v1.SignUpRequest) (*authentication_v1.SignUpResponse, error) {
+func (s *authenticationServiceServer) SignUp(ctx context.Context, req *authentication.SignUpRequest) (*authentication.SignUpResponse, error) {
 	if err := s.checkAPI(req.Api); err != nil {
 		return nil, err
 	}
@@ -123,13 +104,13 @@ func (s *authenticationServiceServer) SignUp(ctx context.Context, req *authentic
 	if err != nil {
 		return nil, err
 	}
-	return &authentication_v1.SignUpResponse{
+	return &authentication.SignUpResponse{
 		Api: apiVersion,
 		Id:  userCreated.ID,
 	}, nil
 }
 
-func (s *authenticationServiceServer) Login(ctx context.Context, req *authentication_v1.LoginRequest) (*authentication_v1.LoginResponse, error) {
+func (s *authenticationServiceServer) Login(ctx context.Context, req *authentication.LoginRequest) (*authentication.LoginResponse, error) {
 	if err := s.checkAPI(req.Api); err != nil {
 		return nil, err
 	}
@@ -158,13 +139,13 @@ func (s *authenticationServiceServer) Login(ctx context.Context, req *authentica
 		return nil, status.Error(codes.Internal, "")
 	}
 	// Sign token and return
-	return &authentication_v1.LoginResponse{
+	return &authentication.LoginResponse{
 		Api:   apiVersion,
 		Token: signedToken,
 	}, nil
 }
 
-func (s *authenticationServiceServer) Validate(ctx context.Context, req *authentication_v1.ValidateRequest) (*authentication_v1.ValidateResponse, error) {
+func (s *authenticationServiceServer) Validate(ctx context.Context, req *authentication.ValidateRequest) (*authentication.ValidateResponse, error) {
 	if err := s.checkAPI(req.Api); err != nil {
 		return nil, err
 	}
@@ -197,7 +178,7 @@ func (s *authenticationServiceServer) Validate(ctx context.Context, req *authent
 		return nil, status.Error(codes.PermissionDenied, "")
 	}
 
-	return &authentication_v1.ValidateResponse{
+	return &authentication.ValidateResponse{
 		Api:  apiVersion,
 		Id:   u.ID,
 		Role: u.Role,

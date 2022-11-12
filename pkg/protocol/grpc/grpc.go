@@ -2,13 +2,13 @@ package grpc
 
 import (
 	"context"
-	admin_v1 "github.com/soulmonk/cuppa-workers-authentication/pkg/api/admin"
-	authentication_v1 "github.com/soulmonk/cuppa-workers-authentication/pkg/api/authentication"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/admin"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/authentication"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/db"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/logger"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/protocol/grpc/middleware"
-	admin_service_v1 "github.com/soulmonk/cuppa-workers-authentication/pkg/service/admin/v1"
-	authentication_service_v1 "github.com/soulmonk/cuppa-workers-authentication/pkg/service/authentication/v1"
+	adminService "github.com/soulmonk/cuppa-workers-authentication/pkg/service/admin"
+	authenticationService "github.com/soulmonk/cuppa-workers-authentication/pkg/service/authentication"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"net"
@@ -33,10 +33,10 @@ func RunServer(ctx context.Context, dao *db.Dao, port string) error {
 	server := grpc.NewServer(opts...)
 	//Register reflection service on gRPC server. to allow use describe command
 	reflection.Register(server)
-	authenticationV1API := authentication_service_v1.NewAuthenticationServiceServer(dao)
-	authentication_v1.RegisterAuthenticationServiceServer(server, authenticationV1API)
-	adminV1API := admin_service_v1.NewAuthenticationServiceServer(dao)
-	admin_v1.RegisterAdminServiceServer(server, adminV1API)
+	authenticationAPI := authenticationService.NewAuthenticationServiceServer(dao)
+	authentication.RegisterAuthenticationServiceServer(server, authenticationAPI)
+	adminAPI := adminService.NewAuthenticationServiceServer(dao)
+	admin.RegisterAdminServiceServer(server, adminAPI)
 
 	// graceful shutdown
 	c := make(chan os.Signal, 1)
