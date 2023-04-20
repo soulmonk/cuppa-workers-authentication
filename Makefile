@@ -61,8 +61,8 @@ clean-proto:
 gen-proto: ## Generate proto
 	@echo "  >  Generate proto"
 	@echo "${YELLOW}Hint${RESET}: in some cases require export path"
-	@echo "export GO_PATH := ~/go"
-	@echo 'export PATH := $$PATH:$$GO_PATH/bin'
+	@echo "export GO_PATH=~/go"
+	@echo 'export PATH=$$PATH:$$GO_PATH/bin'
 	@$(shell $(PROJ_BASE)/third_party/protoc-gen.sh)
 
 
@@ -72,7 +72,7 @@ gen-db: ## Generate go from sql
 
 build-all: ## Runs `gen-proto` `build-server` `c`
 	@echo "  >  Build all"
-	@-$(MAKE) gen-proto build-server
+	@-$(MAKE) gen-proto build-server build-migration build-grpc-client
 
 run-server: ## RUN_OPTIONS='-grpc-port= -http-port= -db-host= --db-port= -db-user= -db-password= -db-name= -log-level=-1 -log-time-format=2006-01-02T15:04:05.999999999Z07:00'
 	@echo "  >  Running server"
@@ -88,7 +88,6 @@ stop-server:
 	@-touch $(PID)
 	@-kill `cat $(PID)` 2> /dev/null || true
 	@-rm $(PID)
-
 
 logs:
 	@tail -f -n 100 $(STDOUT)
@@ -115,6 +114,14 @@ show-up-deps: ## view available dependency upgrades
 go-update-mod-version: ### Update go version
 	@echo " > Update go version to $(go_version)"
 	@go mod edit -go $(go_version)
+
+## Dependency
+# https://github.com/golang/go/wiki/Modules#how-to-upgrade-and-downgrade-dependencies
+view-update-dependency: ## view available minor and patch upgrades for all direct and indirect dependencies
+	@go list -u -m all
+
+upgrade-dependency: ## upgrade all dependencies at once (including test)
+	@go get -t -u ./...
 
 ## Docker:
 install-swagger-docker: ## install swagger-docker
