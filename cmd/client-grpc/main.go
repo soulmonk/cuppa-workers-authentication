@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/admin"
 	"github.com/soulmonk/cuppa-workers-authentication/pkg/api/authentication"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -140,9 +141,9 @@ func createConnection(address string) (conn *grpc.ClientConn, ctx context.Contex
 }
 
 func doTokenValidate(ctx context.Context, conn *grpc.ClientConn) {
-	c := authentication_v1.NewAuthenticationServiceClient(conn)
+	c := authentication.NewAuthenticationServiceClient(conn)
 
-	req := authentication_v1.ValidateRequest{
+	req := authentication.ValidateRequest{
 		Api:   apiVersion,
 		Token: getToken(),
 	}
@@ -154,9 +155,9 @@ func doTokenValidate(ctx context.Context, conn *grpc.ClientConn) {
 }
 
 func doSignUp(ctx context.Context, conn *grpc.ClientConn, username string, email string) {
-	c := authentication_v1.NewAuthenticationServiceClient(conn)
+	c := authentication.NewAuthenticationServiceClient(conn)
 	// Call Create
-	req := authentication_v1.SignUpRequest{
+	req := authentication.SignUpRequest{
 		Api:      apiVersion,
 		Username: username,
 		Email:    email,
@@ -188,8 +189,8 @@ func getToken() string {
 }
 
 func doActivate(ctx context.Context, conn *grpc.ClientConn, id int64) {
-	c := authentication_v1.NewAuthenticationServiceClient(conn)
-	req := authentication_v1.ActivateRequest{
+	c := admin.NewAdminServiceClient(conn)
+	req := admin.ActivateRequest{
 		Api:    apiVersion,
 		Id:     id,
 		Secret: getPassword(),
@@ -202,8 +203,8 @@ func doActivate(ctx context.Context, conn *grpc.ClientConn, id int64) {
 }
 
 func doLogin(ctx context.Context, conn *grpc.ClientConn, username string) {
-	c := authentication_v1.NewAuthenticationServiceClient(conn)
-	req := authentication_v1.LoginRequest{
+	c := authentication.NewAuthenticationServiceClient(conn)
+	req := authentication.LoginRequest{
 		Api:      apiVersion,
 		Username: username,
 		Password: getPassword(),
