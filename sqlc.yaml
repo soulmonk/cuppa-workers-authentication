@@ -3,7 +3,7 @@ packages:
   - path: "./db/user"
     name: "user"
     engine: "postgresql"
-    sql_package: "pgx/v4"
+    sql_package: "pgx/v5"
     schema:
       - "./db/migration/1571546291912_init.sql"
       - "./db/migration/1582635447898_add_refresh-token_to_user.sql"

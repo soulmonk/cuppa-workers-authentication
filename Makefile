@@ -67,7 +67,8 @@ gen-proto: ## Generate proto
 
 
 gen-db: ## Generate go from sql
-	@sqlc generate
+	@echo "USING ${YELLOW}--experimental${RESET}"
+	@sqlc generate --experimental
 
 
 build-all: ## Runs `gen-proto` `build-server` `c`
