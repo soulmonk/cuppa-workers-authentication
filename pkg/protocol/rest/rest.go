@@ -40,12 +40,12 @@ func RunServer(ctx context.Context, httpPort string) error {
 		for range c {
 			// sig is a ^C, handle it
 			logger.Log.Warn("shutting down HTTP/REST gateway...")
+
+			_, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+
+			_ = srv.Shutdown(ctx)
 		}
-
-		_, cancel := context.WithTimeout(ctx, 5*time.Second)
-		defer cancel()
-
-		_ = srv.Shutdown(ctx)
 	}()
 
 	logger.Log.Info("starting HTTP/REST gateway...")

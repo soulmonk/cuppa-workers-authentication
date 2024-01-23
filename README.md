@@ -8,6 +8,13 @@ Build application
 Run application
 - `make run-server`
 
+## Requirements
+
+- Generate code for grpc `protobuf` is required, install it with `brew`:
+  ```shell
+  brew install protobuf protoc-gen-go protoc-gen-go-grpc
+  ```
+
 ## TODO
 - use go mod
 - ??? user id in login response
