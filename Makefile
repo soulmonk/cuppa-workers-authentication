@@ -5,6 +5,9 @@ PROJECT_NAME := $(shell basename "$(PWD)")
 PROJ_BASE := $(shell pwd -LP)
 PROJ_BUILD_PATH := $(PROJ_BASE)/build
 
+# Installed Go version without the 'go' prefix (i.e. '1.21.3').
+GO_VERSION := $(shell go version | awk '{print $$3}'| sed 's/go//g')
+
 # PID file will keep the process id of the server
 PID := /tmp/.$(PROJECTNAME).pid
 
@@ -39,7 +42,8 @@ init: ## Simple initialization. Make `third_party/protoc-gen.sh` executable
 	@echo " > Simple initialization"
 	@echo " >> Make 'third_party/protoc-gen.sh' executable"
 	@chmod +x $(PROJ_BASE)/third_party/protoc-gen.sh
-	@-mkdir -p pkg/api/v1
+	@-mkdir -p pkg/api/admin
+	@-mkdir -p pkg/api/authentication
 	@-mkdir -p api/swagger/v1
 
 #clean:
@@ -113,8 +117,8 @@ show-up-deps: ## view available dependency upgrades
 	@go list -u -m all
 
 go-update-mod-version: ### Update go version
-	@echo " > Update go version to $(go_version)"
-	@go mod edit -go $(go_version)
+	@echo " > Update go version to $(GO_VERSION)"
+	@go mod edit -go $(GO_VERSION)
 
 ## Dependency
 # https://github.com/golang/go/wiki/Modules#how-to-upgrade-and-downgrade-dependencies
@@ -155,6 +159,8 @@ stop-swagger-docker: ## stopping swagger docker
 all: help
 ## Help:
 help: ## Show this help.
+	@echo ''
+	@echo 'Installed GO version: $(GO_VERSION)'
 	@echo ''
 	@echo 'Usage:'
 	@echo '  ${YELLOW}make${RESET} ${GREEN}<target>${RESET}'
